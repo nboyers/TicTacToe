@@ -58,13 +58,10 @@
 		DF64F47926792D3B008FF24D /* TicTacToe */ = {
 			isa = PBXGroup;
 			children = (
-				DF64F47A26792D3B008FF24D /* TicTacToeApp.swift */,
-				DF64F489267A5885008FF24D /* Alerts.swift */,
-				DF64F48D267A6B6A008FF24D /* GameModel.swift */,
-				DF64F48B267A6656008FF24D /* GameViewModel.swift */,
-				DF64F47C26792D3B008FF24D /* GameView.swift */,
-				DF64F47E26792D3D008FF24D /* Assets.xcassets */,
-				DF64F48326792D3D008FF24D /* Info.plist */,
+				DFFC684D27641AA30038DDD0 /* GameModel */,
+				DFFC684F27641AE30038DDD0 /* Viewmodel */,
+				DFFC685027641AFA0038DDD0 /* Views */,
+				DFFC684E27641ABB0038DDD0 /* Supporting */,
 				DF64F48026792D3D008FF24D /* Preview Content */,
 			);
 			path = TicTacToe;
@@ -76,6 +73,41 @@
 				DF64F48126792D3D008FF24D /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		DFFC684D27641AA30038DDD0 /* GameModel */ = {
+			isa = PBXGroup;
+			children = (
+				DF64F48D267A6B6A008FF24D /* GameModel.swift */,
+				DF64F489267A5885008FF24D /* Alerts.swift */,
+			);
+			path = GameModel;
+			sourceTree = "<group>";
+		};
+		DFFC684E27641ABB0038DDD0 /* Supporting */ = {
+			isa = PBXGroup;
+			children = (
+				DF64F47A26792D3B008FF24D /* TicTacToeApp.swift */,
+				DF64F47E26792D3D008FF24D /* Assets.xcassets */,
+				DF64F48326792D3D008FF24D /* Info.plist */,
+			);
+			path = Supporting;
+			sourceTree = "<group>";
+		};
+		DFFC684F27641AE30038DDD0 /* Viewmodel */ = {
+			isa = PBXGroup;
+			children = (
+				DF64F48B267A6656008FF24D /* GameViewModel.swift */,
+			);
+			path = Viewmodel;
+			sourceTree = "<group>";
+		};
+		DFFC685027641AFA0038DDD0 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				DF64F47C26792D3B008FF24D /* GameView.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
