@@ -16,7 +16,7 @@ struct GameView: View {
         GeometryReader { geometry in
             VStack {
                 Spacer()
-                LazyVGrid(columns: viewModel.column, spacing: 5){
+                LazyVGrid(columns: viewModel.column, spacing: 5) {
                     ForEach(0..<9) { i in
                         ZStack {
                             GameCircleView(proxy: geometry)

@@ -9,8 +9,10 @@ import SwiftUI
 
 
 //MARK: MODELS
-enum Player {
-    case human, computer
+enum Player: Int {
+    case human = -1
+    case blank = 0
+    case computer = 1
 }
 
 struct Move {
