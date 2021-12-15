@@ -13,8 +13,8 @@
 		DF64F48226792D3D008FF24D /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DF64F48126792D3D008FF24D /* Preview Assets.xcassets */; };
 		DF64F48A267A5885008FF24D /* Alerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF64F489267A5885008FF24D /* Alerts.swift */; };
 		DF64F48C267A6656008FF24D /* GameViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF64F48B267A6656008FF24D /* GameViewModel.swift */; };
-		DF64F48E267A6B6A008FF24D /* GameModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF64F48D267A6B6A008FF24D /* GameModel.swift */; };
 		DFFC685227641C310038DDD0 /* MainMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFFC685127641C310038DDD0 /* MainMenuView.swift */; };
+		DFFFE3AA2769406500B7515B /* Board.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFFFE3A92769406500B7515B /* Board.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,8 +26,8 @@
 		DF64F48326792D3D008FF24D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DF64F489267A5885008FF24D /* Alerts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Alerts.swift; sourceTree = "<group>"; };
 		DF64F48B267A6656008FF24D /* GameViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewModel.swift; sourceTree = "<group>"; };
-		DF64F48D267A6B6A008FF24D /* GameModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameModel.swift; sourceTree = "<group>"; };
 		DFFC685127641C310038DDD0 /* MainMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMenuView.swift; sourceTree = "<group>"; };
+		DFFFE3A92769406500B7515B /* Board.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Board.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -80,8 +80,8 @@
 		DFFC684D27641AA30038DDD0 /* GameModel */ = {
 			isa = PBXGroup;
 			children = (
-				DF64F48D267A6B6A008FF24D /* GameModel.swift */,
 				DF64F489267A5885008FF24D /* Alerts.swift */,
+				DFFFE3A92769406500B7515B /* Board.swift */,
 			);
 			path = GameModel;
 			sourceTree = "<group>";
@@ -183,9 +183,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				DFFC685227641C310038DDD0 /* MainMenuView.swift in Sources */,
-				DF64F48E267A6B6A008FF24D /* GameModel.swift in Sources */,
 				DF64F48C267A6656008FF24D /* GameViewModel.swift in Sources */,
 				DF64F47D26792D3B008FF24D /* GameView.swift in Sources */,
+				DFFFE3AA2769406500B7515B /* Board.swift in Sources */,
 				DF64F48A267A5885008FF24D /* Alerts.swift in Sources */,
 				DF64F47B26792D3B008FF24D /* TicTacToeApp.swift in Sources */,
 			);
@@ -245,7 +245,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -300,7 +300,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -320,15 +320,16 @@
 				DEVELOPMENT_TEAM = JCL982F3T2;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = TicTacToe/Supporting/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				PRODUCT_BUNDLE_IDENTIFIER = frent.nobos.TicTacToe;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -342,15 +343,16 @@
 				DEVELOPMENT_TEAM = JCL982F3T2;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = TicTacToe/Supporting/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				PRODUCT_BUNDLE_IDENTIFIER = frent.nobos.TicTacToe;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};

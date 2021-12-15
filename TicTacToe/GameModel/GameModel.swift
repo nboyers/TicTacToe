@@ -9,16 +9,19 @@ import SwiftUI
 
 
 //MARK: MODELS
-enum Player: Int {
-    case human = -1
-    case blank = 0
-    case computer = 1
-}
-
-struct Move {
-    let player : Player
-    let boardIndex : Int
-    var indicator : String {
-        return player == .human ? "xmark" : "circle"
-    }
-}
+enum Piece: String {
+     case X = "X"
+     case O = "O"
+     case E = " "
+     var opposite: Piece {
+         switch self {
+         case .X:
+             return .O
+         case .O:
+             return .X
+         case .E:
+             return .E
+         }
+     }
+ }
+typealias Move = Int

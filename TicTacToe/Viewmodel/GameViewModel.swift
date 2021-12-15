@@ -46,8 +46,7 @@ final class GameViewModel : ObservableObject {
         }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [self] in
-            let computerPostion = minimax(currentPostion: postion, depth: 3,
-                                          alpha: -1, beta: 1, maximizingPlayer: true)
+            let computerPostion = findBestMove()
             
             moves[computerPostion] = Move(player: .computer, boardIndex: computerPostion) //UPDATES THE BOARD GAME OF THE UI
             
@@ -68,44 +67,44 @@ final class GameViewModel : ObservableObject {
         }
     }
     
-    func determainMovePosition(in moves: [Move?]) -> Int {
-        // MARK: IF AI Can win, win -- MEDUIM
-        let computerMoves = moves.compactMap { $0 }.filter{$0.player == .computer}
-        let computerPostion = Set(computerMoves.map{ $0.boardIndex }) // filters to see only the Computer's move / placement
-        
-        for pattern in winPatterns {
-            let winPostions: Set<Int> = pattern.subtracting(computerPostion)
-            if winPostions.count == 1 {
-                let isAvaiable = !isSquareOccupied(in: moves, forIndex: winPostions.first!)
-                if isAvaiable { return winPostions.first! }
-            }
-        }
-        //MARK: If AI can't win, block
-        let humanMoves = moves.compactMap { $0 }.filter{$0.player == .human}
-        let humanPostion = Set(humanMoves.map{ $0.boardIndex })
-        
-        for pattern in winPatterns {
-            let winPostions = pattern.subtracting(humanPostion)
-            if winPostions.count == 1 {
-                let isAvaiable = !isSquareOccupied(in: moves, forIndex: winPostions.first!)
-                if isAvaiable { return winPostions.first! }
-            }
-        }
-        
-        //MARK: If AI can't block, take middle spot
-        let centerSquare = 4
-        if !isSquareOccupied(in: moves, forIndex: centerSquare) {
-            return centerSquare
-        }
-        
-        //MARK: If AI can't take middle square, random avaible square -- EASY
-        var movePostion = Int.random(in: 0..<9)
-        
-        repeat  {
-            movePostion = Int.random(in: 0..<9)
-        } while isSquareOccupied(in: moves, forIndex: movePostion)
-        return movePostion
-    }
+    //    func determainMovePosition(in moves: [Move?]) -> Int {
+    //        // MARK: IF AI Can win, win -- MEDUIM
+    //        let computerMoves = moves.compactMap { $0 }.filter{$0.player == .computer}
+    //        let computerPostion = Set(computerMoves.map{ $0.boardIndex }) // filters to see only the Computer's move / placement
+    //
+    //        for pattern in winPatterns {
+    //            let winPostions: Set<Int> = pattern.subtracting(computerPostion)
+    //            if winPostions.count == 1 {
+    //                let isAvaiable = !isSquareOccupied(in: moves, forIndex: winPostions.first!)
+    //                if isAvaiable { return winPostions.first! }
+    //            }
+    //        }
+    //        //MARK: If AI can't win, block
+    //        let humanMoves = moves.compactMap { $0 }.filter{$0.player == .human}
+    //        let humanPostion = Set(humanMoves.map{ $0.boardIndex })
+    //
+    //        for pattern in winPatterns {
+    //            let winPostions = pattern.subtracting(humanPostion)
+    //            if winPostions.count == 1 {
+    //                let isAvaiable = !isSquareOccupied(in: moves, forIndex: winPostions.first!)
+    //                if isAvaiable { return winPostions.first! }
+    //            }
+    //        }
+    //
+    //        //MARK: If AI can't block, take middle spot
+    //        let centerSquare = 4
+    //        if !isSquareOccupied(in: moves, forIndex: centerSquare) {
+    //            return centerSquare
+    //        }
+    //
+    //        //MARK: If AI can't take middle square, random avaible square -- EASY
+    //        var movePostion = Int.random(in: 0..<9)
+    //
+    //        repeat  {
+    //            movePostion = Int.random(in: 0..<9)
+    //        } while isSquareOccupied(in: moves, forIndex: movePostion)
+    //        return movePostion
+    //    }
     
     func checkWinCondition(for player: Player, in moves: [Move?]) -> Bool {
         let playerMoves = moves.compactMap{ $0 }.filter{ $0.player == player }
@@ -129,38 +128,50 @@ final class GameViewModel : ObservableObject {
     }
     
     
-    //FIXME: The parameter 'current postion is broken as it is looking for a Set<> and it's passing a Int
-    private func minimax(currentPostion: Int, depth: Int, alpha: Int, beta: Int, maximizingPlayer: Bool) -> Int {
-        if depth == 0 || checkWinCondition(for: .computer, in: moves) { return  currentPostion }
-        var eval = -1
-        var maxEval = 0
-       
+    //FIXME:
+    private func minimax(Board: [Move?], depth: Int, alpha: Int, beta: Int, maximizingPlayer: Bool) -> Int {
+        if checkWinCondition(for: .computer, in: moves) || checkForDraw(in: moves) { return  0 }
+        var score = -1
+        var bestScore = 0
+        
         
         if maximizingPlayer {
-            for pattern in winPatterns {
-                maxEval = -1
-              //  eval = minimax(currentPostion: pattern, depth: depth - 1, alpha: alpha, beta: beta, maximizingPlayer: false)
-               var alpha = max(alpha,eval)
-                if beta <= alpha {
-                    break
-                }
-                return max(maxEval,eval)
-            }
+            bestScore = Int.min
+            score = minimax(Board: Board, depth: depth + 1, alpha: alpha, beta: beta, maximizingPlayer: false)
+            //            var alpha = max(alpha,eval)
+            //            if beta <= alpha {
+            //                break
+            //            }
+            return max(bestScore,score)
             
         } else {
-            for pattern in winPatterns {
-                maxEval = 1
-              //  eval = minimax(currentPostion: pattern, depth: depth - 1, alpha: alpha, beta: beta, maximizingPlayer: true)
-              var beta = min(beta,eval)
-                if beta <= alpha {
-                    break
-                }
-                return min(maxEval,eval)
-            }
+            
+            bestScore = Int.max
+            score = minimax(Board: Board, depth: depth + 1, alpha: alpha, beta: beta, maximizingPlayer: true)
+            //            var beta = min(beta,eval)
+            //            if beta <= alpha {
+            //                break
+            //            }
+            
+            return min(bestScore, score)
         }
-        return -1
     }
     
+    func findBestMove() -> Int {
+        let bestScore = Int.min
+        var movePiece = 0
+        var occupidedSpace = 0
+        
+        if !isSquareOccupied(in: moves, forIndex: occupidedSpace) {
+            occupidedSpace += 1
+        } else {
+            let score = minimax(Board: moves, depth: 0, alpha: 0, beta: 0, maximizingPlayer: true)
+            if score > bestScore {
+                movePiece = occupidedSpace
+            }
+        }
+        return movePiece
+    }
 }
 
 
