@@ -9,7 +9,7 @@ import Foundation
 
 
 enum Player {
-  case human, computer
+    case human, computer
 }
 
 struct Move {
