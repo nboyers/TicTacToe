@@ -20,10 +20,10 @@ struct AlertContext {
                                        buttonTitle: Text("Play Again"))
     
     static let computerWin = AlertItem(title: Text("YOU LOST"),
-                                       message: Text("Maybe Next Time"),
+                                       message: Text("Maybe Next Time Champ"),
                                        buttonTitle: Text("Play Again"))
     
     static let draw        = AlertItem(title: Text("Draw"),
-                                       message: Text("Well That Was Disapointing"),
+                                       message: Text("At least you didn't lose"),
                                        buttonTitle: Text("Play Again"))
 }

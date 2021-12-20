@@ -10,34 +10,34 @@ import SwiftUI
 struct GameView: View {
     
     @StateObject private var viewModel = GameViewModel()
+    private var Model = Board()
+    let column: [GridItem] = [GridItem(.flexible()),
+                              GridItem(.flexible()),
+                              GridItem(.flexible()),]
+    
+    
     
     var body: some View {
         
         GeometryReader { geometry in
             VStack {
                 Spacer()
-                LazyVGrid(columns: viewModel.column, spacing: 5) {
+                LazyVGrid(columns: column, spacing: 5) {
                     ForEach(0..<9) { i in
                         ZStack {
                             GameCircleView(proxy: geometry)
-                            PlayerIndicator(systemImageName:
-                                                viewModel.moves[i]?.indicator ?? "")
-                            
+                            PlayerIndicator(systemImageName: " ")
                         }.onTapGesture {
-                            viewModel.processPlayerMove(for: i)
+                            viewModel.move(i)
+                            print(i)
                         }
                     }
                 }
+                
                 Spacer()
             }
+            .padding()
         }
-        .disabled(viewModel.isGameBoardDisabled)
-        .padding()
-        .alert(item: $viewModel.alertItem, content: { alertItem in
-            Alert(title: alertItem.title,
-                  message: alertItem.message,
-                  dismissButton: .default(alertItem.buttonTitle, action:{ viewModel.resetGame() }))
-        })
     }
 }
 struct GameCircleView: View {
@@ -53,7 +53,6 @@ struct GameCircleView: View {
 
 struct PlayerIndicator: View {
     var systemImageName : String
-    
     var body: some View {
         Image(systemName: systemImageName)
             .resizable()
