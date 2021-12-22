@@ -10,32 +10,25 @@ import SwiftUI
 struct GameView: View {
     
     @StateObject private var viewModel = GameViewModel()
-    private var Model = Board()
-    let column: [GridItem] = [GridItem(.flexible()),
-                              GridItem(.flexible()),
-                              GridItem(.flexible()),]
-    
-    
-    
     var body: some View {
         
         GeometryReader { geometry in
             VStack {
                 Spacer()
-                LazyVGrid(columns: column, spacing: 5) {
+                LazyVGrid(columns: viewModel.column, spacing: 5) {
                     ForEach(0..<9) { i in
                         ZStack {
                             GameCircleView(proxy: geometry)
-                            PlayerIndicator(systemImageName: " ")
+                            PlayerIndicator(systemImageName: viewModel.board.position[i].rawValue)
                         }.onTapGesture {
-                            viewModel.move(i)
-                            print(i)
+                            viewModel.processGame(i)
                         }
                     }
                 }
                 
                 Spacer()
             }
+            .disabled(viewModel.isDisabled)
             .padding()
         }
     }
@@ -62,6 +55,7 @@ struct PlayerIndicator: View {
 
 
 struct ContentView_Previews: PreviewProvider {
+    
     static var previews: some View {
         GameView()
     }

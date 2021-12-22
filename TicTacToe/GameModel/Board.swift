@@ -11,9 +11,10 @@ import Foundation
 typealias Move = Int
 
 enum Piece: String {
-    case X = "X"
-    case O = "O"
-    case E = " "
+    case X = "xmark"
+    case O = "circle"
+    case E = ""
+    
     var opposite: Piece {
         switch self {
         case .X:
@@ -27,8 +28,7 @@ enum Piece: String {
 }
 
 struct Board {
-    let position: [Piece]
-    
+    var position: [Piece]
     let turn: Piece
     let lastMove: Move
     // by default the board is empty and X goes first
