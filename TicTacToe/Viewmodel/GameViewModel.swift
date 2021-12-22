@@ -14,7 +14,6 @@ final class GameViewModel : ObservableObject {
     let column: [GridItem] = [GridItem(.flexible()),
                               GridItem(.flexible()),
                               GridItem(.flexible()),]
-    private var model = Board()
     @Published var board: Board = Board.init()
     // the legal moves in a position are all of the empty squares
     var legalMoves: [Move] {
