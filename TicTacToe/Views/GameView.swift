@@ -9,7 +9,7 @@ import SwiftUI
 
 struct GameView: View {
     
-    @StateObject private var viewModel = GameViewModel()
+    @StateObject private var viewModel = GameViewModel(start: .init())
     var body: some View {
         
         GeometryReader { geometry in
@@ -27,7 +27,7 @@ struct GameView: View {
                 }
                 
                 Spacer()
-            }
+            }.disabled(viewModel.isDisabled)
             .padding()
         }
     }

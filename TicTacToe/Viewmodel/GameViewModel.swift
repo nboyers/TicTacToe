@@ -9,69 +9,46 @@ import SwiftUI
 
 final class GameViewModel : ObservableObject {
     
-    var isDisabled = false
+    @Published var isDisabled = false
+    @State var isHumanTurn = true
     
     let column: [GridItem] = [GridItem(.flexible()),
                               GridItem(.flexible()),
                               GridItem(.flexible()),]
-
-    @Published var model  = Board.init()
     
+    @Published var model: Board
     
-    // the legal moves in a position are all of the empty squares
-    var legalMoves: [Move] {
-        return model.position.indices.filter { model.position[$0] == .E }
-    }
-    var isDraw: Bool {
-        return !isWin && legalMoves.count == 0
+    init(start: Board){
+        model = start
     }
     
-    var isWin: Bool {
-        model.position[0] == model.position[1] && model.position[0] == model.position[2] && model.position[0] != .E || // row 0
-        model.position[3] == model.position[4] && model.position[3] == model.position[5] && model.position[3] != .E || // row 1
-        model.position[6] == model.position[7] && model.position[6] == model.position[8] && model.position[6] != .E || // row 2
-        model.position[0] == model.position[3] && model.position[0] == model.position[6] && model.position[0] != .E || // col 0
-        model.position[1] == model.position[4] && model.position[1] == model.position[7] && model.position[1] != .E || // col 1
-        model.position[2] == model.position[5] && model.position[2] == model.position[8] && model.position[2] != .E || // col 2
-        model.position[0] == model.position[4] && model.position[0] == model.position[8] && model.position[0] != .E || // diag 0
-        model.position[2] == model.position[4] && model.position[2] == model.position[6] && model.position[2] != .E    // diag 1
-        
-    }
     
     func processGame(_ location: Move) {
-        if model.position[location] == .E {
-            model = move(location)
+        if model.position[location] == .E || isHumanTurn {
+            model = model.move(location)
+            isDisabled.toggle()
         }
+        procressAI(model)
     }
     
-    
-    // location can be 0-8, indicating where to move
-    // return a new board with the move played
-    func move(_ location: Move) -> Board {
-        var tempPosition = model.position
-        tempPosition[location] = model.turn
-        return Board(position: tempPosition, turn: model.turn.opposite, lastMove: location)
-    }
-    
-    // Find the best possible outcome for originalPlayer
     private func minimax(_ board: Board, maximizing: Bool, originalPlayer: Piece) -> Int {
         // Base case - evaluate the position if it is a win or a draw
-        if isWin && originalPlayer == model.turn.opposite { return 1 } // win
-        else if isWin && originalPlayer != model.turn.opposite { return -1 } // loss
-        else if isDraw { return 0 } // draw
+        if board.isWin && originalPlayer == board.turn.opposite { return 1 } // win
+        else if board.isWin && originalPlayer != board.turn.opposite { return -1 } // loss
+        else if board.isDraw { return 0 } // draw
         
         // Recursive case - maximize your gains or minimize the opponent's gains
         if maximizing {
             var bestScore = Int.min
-            for moveOption in legalMoves { // find the move with the highest evaluation
-                let score = minimax(move(moveOption), maximizing: false, originalPlayer: originalPlayer)
+            for move in board.legalMoves { // find the move with the highest evaluation
+                let score = minimax(board.move(move), maximizing: false, originalPlayer: originalPlayer)
                 bestScore = max(score, bestScore)
             }
             return bestScore
         } else { // minimizing
             var worstScore = Int.max
-            for moveOption in legalMoves {
-                let score = minimax(move(moveOption), maximizing: true, originalPlayer: originalPlayer)
+            for move in board.legalMoves {
+                let score = minimax(board.move(move), maximizing: true, originalPlayer: originalPlayer)
                 worstScore = min(score, worstScore)
             }
             return worstScore
@@ -82,8 +59,8 @@ final class GameViewModel : ObservableObject {
     private func findBestMove(_ board: Board) -> Move {
         var bestScore = Int.min
         var bestMove = -1
-        for moveOption in legalMoves {
-            let score = minimax(move(moveOption), maximizing: false, originalPlayer: model.turn)
+        for moveOption in board.legalMoves {
+            let score = minimax(board.move(moveOption), maximizing: true, originalPlayer: model.turn)
             if score > bestScore {
                 bestScore = score
                 bestMove = moveOption
@@ -92,8 +69,17 @@ final class GameViewModel : ObservableObject {
         return bestMove
     }
     
-    func resetGame() {
-       model = .init()
+    private  func resetGame() {
+        model = .init()
+    }
+    
+    private func procressAI(_ board: Board) {
+        let toWinHardPosition: [Piece] = model.position
+        
+        let currentBoard: Board = Board(position: toWinHardPosition, turn: board.turn, lastMove: board.lastMove)
+        model = board.move(findBestMove(currentBoard))
+        
+        isDisabled.toggle()
     }
 }
 
