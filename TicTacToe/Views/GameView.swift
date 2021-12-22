@@ -19,7 +19,7 @@ struct GameView: View {
                     ForEach(0..<9) { i in
                         ZStack {
                             GameCircleView(proxy: geometry)
-                            PlayerIndicator(systemImageName: viewModel.board.position[i].rawValue)
+                            PlayerIndicator(systemImageName: viewModel.model.position[i].rawValue)
                         }.onTapGesture {
                             viewModel.processGame(i)
                         }
@@ -28,7 +28,6 @@ struct GameView: View {
                 
                 Spacer()
             }
-            .disabled(viewModel.isDisabled)
             .padding()
         }
     }
@@ -36,7 +35,6 @@ struct GameView: View {
 struct GameCircleView: View {
     var proxy : GeometryProxy
     var body: some View {
-        
         Circle()
             .foregroundColor(.red).opacity(0.5)
             .frame(width: proxy.size.width/3 - 15,
