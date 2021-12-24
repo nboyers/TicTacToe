@@ -9,13 +9,17 @@ import SwiftUI
 
 struct GameView: View {
     
-    @StateObject private var viewModel = GameViewModel(start: .init())
+    @StateObject private var viewModel = GameViewModel()
+    let column: [GridItem] = [GridItem(.flexible()),
+                              GridItem(.flexible()),
+                              GridItem(.flexible()),]
+    
     var body: some View {
         
         GeometryReader { geometry in
             VStack {
                 Spacer()
-                LazyVGrid(columns: viewModel.column, spacing: 5) {
+                LazyVGrid(columns: column, spacing: 5) {
                     ForEach(0..<9) { i in
                         ZStack {
                             GameCircleView(proxy: geometry)
