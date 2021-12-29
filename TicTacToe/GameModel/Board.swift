@@ -66,45 +66,55 @@ struct Board {
         return Board(position: tempPosition, turn: turn.opposite, lastMove: location)
     }
     
-    // Find the best possible outcome for originalPlayer
-     func minimax(_ board: Board, maximizing: Bool, originalPlayer: Piece) -> Int {
-         // Base case - evaluate the position if it is a win or a draw
-         if board.isWin && originalPlayer == board.turn.opposite { return 1 } // win
-         else if board.isWin && originalPlayer != board.turn.opposite { return -1 } // loss
-         else if board.isDraw { return 0 } // draw
-      
-         // Recursive case - maximize your gains or minimize the opponent's gains
-         if maximizing {
-             var bestScore = Int.min
-             for moveOption in board.legalMoves { // find the move with the highest evaluation
-                 let result = minimax(board.move(moveOption), maximizing: false, originalPlayer: originalPlayer)
-                 bestScore = max(result, bestScore)
-             }
-             return bestScore
-         } else { // minimizing
-             var worstScore = Int.max
-             for moveOption in board.legalMoves {
-                 let result = minimax(board.move(moveOption), maximizing: true, originalPlayer: originalPlayer)
-                 worstScore = min(result, worstScore)
-             }
-             return worstScore
-         }
-     }
-      
+    //MARK: Find the best possible outcome for originalPlayer
+    func minimax(_ board: Board, maximizing: Bool, originalPlayer: Piece, alpha: Int, beta: Int) -> Int {
+        // Base case - evaluate the position if it is a win or a draw
+        if board.isWin && originalPlayer == board.turn.opposite { return 1 } // win
+        else if board.isWin && originalPlayer != board.turn.opposite { return -1 } // loss
+        else if board.isDraw { return 0 } // draw
+        
+        var alpha = alpha
+        var beta = beta
+        //MARK: Recursive case - maximize your gains or minimize the opponent's gains
+        if maximizing {
+            var bestScore = Int.min
+            for moveOption in board.legalMoves { // find the move with the highest evaluation
+                let result = minimax(board.move(moveOption), maximizing: false, originalPlayer: originalPlayer, alpha: alpha,beta: beta)
+                bestScore = max(result, bestScore)
+                alpha = max(alpha, result)
+                if beta <= alpha {
+                    break
+                }
+            }
+            return bestScore
+        } else { // minimizing
+            var worstScore = Int.max
+            for moveOption in board.legalMoves {
+                let result = minimax(board.move(moveOption), maximizing: true, originalPlayer: originalPlayer, alpha: alpha, beta: beta)
+                worstScore = min(result, worstScore)
+                beta = min(beta,worstScore)
+                if beta <= alpha {
+                    break
+                }
+            }
+            return worstScore
+        }
+    }
     
-    // Run minimax on every possible move to find the best one
+    
+    //MARK: Run minimax on every possible move to find the best one
     func findBestMove(_ board: Board) -> Move {
-         var bestScore = Int.min
-         var bestMove = -1
-         for moveOption in board.legalMoves {
-             let result = minimax(board.move(moveOption), maximizing: false, originalPlayer: board.turn)
-             if result > bestScore {
-                 bestScore = result
-                 bestMove = moveOption
-             }
-         }
-         return bestMove
-     }
+        var bestScore = Int.min
+        var bestMove = -1
+        for moveOption in board.legalMoves {
+            let result = minimax(board.move(moveOption), maximizing: false, originalPlayer: board.turn, alpha: Int.min, beta: Int.max)
+            if result > bestScore {
+                bestScore = result
+                bestMove = moveOption
+            }
+        }
+        return bestMove
+    }
     
 }
 

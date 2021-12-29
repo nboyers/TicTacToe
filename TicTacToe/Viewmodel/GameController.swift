@@ -26,7 +26,7 @@ class GameViewModel : ObservableObject {
         }
         
         let computerMove = gameBoard.findBestMove(gameBoard)
-        print("PASSED 2/3")
+        
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [self] in
             gameBoard = gameBoard.move(computerMove)
             isDisabled.toggle()
