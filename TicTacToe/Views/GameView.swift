@@ -9,7 +9,7 @@ import SwiftUI
 
 struct GameView: View {
     
-    @StateObject private var viewModel = GameViewModel()
+    @StateObject private var viewModel = GameViewModel(position: [.E, .E, .E, .E, .E, .E, .E, .E, .E], turn: .X, lastMove: -1)
     let column: [GridItem] = [GridItem(.flexible()),
                               GridItem(.flexible()),
                               GridItem(.flexible()),]
@@ -23,7 +23,7 @@ struct GameView: View {
                     ForEach(0..<9) { i in
                         ZStack {
                             GameCircleView(proxy: geometry)
-                            PlayerIndicator(systemImageName: viewModel.model.position[i].rawValue)
+                            PlayerIndicator(systemImageName: viewModel.gameBoard.position[i].rawValue)
                         }.onTapGesture {
                             viewModel.processGame(i)
                         }
