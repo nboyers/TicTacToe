@@ -14,8 +14,9 @@ struct GameView: View {
                               GridItem(.flexible()),
                               GridItem(.flexible()),]
     
+    var difficulty: Int
+    
     var body: some View {
-        
         GeometryReader { geometry in
             VStack {
                 Spacer()
@@ -59,7 +60,7 @@ struct PlayerIndicator: View {
 struct ContentView_Previews: PreviewProvider {
     
     static var previews: some View {
-        GameView()
+        GameView(difficulty: -1)
     }
 }
 

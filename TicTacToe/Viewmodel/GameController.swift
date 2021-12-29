@@ -18,11 +18,12 @@ class GameViewModel : ObservableObject {
     }
     
     // the legal moves in a position are all of the empty squares
-
+    
     func processGame(_ location: Move) {
+        
         if gameBoard.position[location] == .E {
             gameBoard = gameBoard.move(location)
-           isDisabled.toggle()
+            isDisabled.toggle()
         }
         
         let computerMove = gameBoard.findBestMove(gameBoard)

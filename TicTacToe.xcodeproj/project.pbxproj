@@ -12,6 +12,7 @@
 		DF64F47F26792D3D008FF24D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DF64F47E26792D3D008FF24D /* Assets.xcassets */; };
 		DF64F48226792D3D008FF24D /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DF64F48126792D3D008FF24D /* Preview Assets.xcassets */; };
 		DF64F48A267A5885008FF24D /* Alerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF64F489267A5885008FF24D /* Alerts.swift */; };
+		DFB86876277CF79D006BFE2F /* Shape+extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFB86875277CF79D006BFE2F /* Shape+extension.swift */; };
 		DFD0CAE82776793F00B740A7 /* GameController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFD0CAE72776793F00B740A7 /* GameController.swift */; };
 		DFFC685227641C310038DDD0 /* MainMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFFC685127641C310038DDD0 /* MainMenuView.swift */; };
 		DFFFE3AA2769406500B7515B /* Board.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFFFE3A92769406500B7515B /* Board.swift */; };
@@ -25,6 +26,7 @@
 		DF64F48126792D3D008FF24D /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		DF64F48326792D3D008FF24D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DF64F489267A5885008FF24D /* Alerts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Alerts.swift; sourceTree = "<group>"; };
+		DFB86875277CF79D006BFE2F /* Shape+extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Shape+extension.swift"; sourceTree = "<group>"; };
 		DFD0CAE72776793F00B740A7 /* GameController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameController.swift; sourceTree = "<group>"; };
 		DFFC685127641C310038DDD0 /* MainMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMenuView.swift; sourceTree = "<group>"; };
 		DFFFE3A92769406500B7515B /* Board.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Board.swift; sourceTree = "<group>"; };
@@ -60,6 +62,7 @@
 		DF64F47926792D3B008FF24D /* TicTacToe */ = {
 			isa = PBXGroup;
 			children = (
+				DFB86874277CF787006BFE2F /* Extensions */,
 				DFFC684D27641AA30038DDD0 /* GameModel */,
 				DFFC684F27641AE30038DDD0 /* Viewmodel */,
 				DFFC685027641AFA0038DDD0 /* Views */,
@@ -75,6 +78,14 @@
 				DF64F48126792D3D008FF24D /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		DFB86874277CF787006BFE2F /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				DFB86875277CF79D006BFE2F /* Shape+extension.swift */,
+			);
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 		DFFC684D27641AA30038DDD0 /* GameModel */ = {
@@ -183,6 +194,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DFFC685227641C310038DDD0 /* MainMenuView.swift in Sources */,
+				DFB86876277CF79D006BFE2F /* Shape+extension.swift in Sources */,
 				DFD0CAE82776793F00B740A7 /* GameController.swift in Sources */,
 				DF64F47D26792D3B008FF24D /* GameView.swift in Sources */,
 				DFFFE3AA2769406500B7515B /* Board.swift in Sources */,
