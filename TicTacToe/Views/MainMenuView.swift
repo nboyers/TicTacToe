@@ -23,7 +23,7 @@ struct MainMenuView: View {
                     NavigationLink("Medium", destination:
                                     GameView(difficulty: 1))
                     NavigationLink("Hard", destination:
-                                    GameView(difficulty: 3))
+                                    GameView(difficulty: 2))
                     NavigationLink("Impossible", destination:
                                     GameView(difficulty: 3))
                 }

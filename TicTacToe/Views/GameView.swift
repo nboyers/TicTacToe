@@ -26,14 +26,19 @@ struct GameView: View {
                             GameCircleView(proxy: geometry)
                             PlayerIndicator(systemImageName: viewModel.gameBoard.position[i].rawValue)
                         }.onTapGesture {
-                            viewModel.processGame(i)
+                            viewModel.processGame(i, diffculty: difficulty)
                         }
                     }
                 }
                 
                 Spacer()
             }.disabled(viewModel.isDisabled)
-            .padding()
+                .padding()
+                .alert(item: $viewModel.alertItem, content: { alertItem in
+                    Alert(title: alertItem.title,
+                          message: alertItem.message,
+                          dismissButton: .default(viewModel.alertItem!.buttonTitle, action:  { viewModel.resetGame() } ))
+                })
         }
     }
 }

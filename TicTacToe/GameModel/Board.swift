@@ -60,6 +60,10 @@ struct Board {
         position[2] == position[4] && position[2] == position[6] && position[2] != .E    // diag 1
         
     }
+    var winPosition: Set<Set<Int>> = [[0,1,2],[3,4,5],[6,7,8],
+                                      [0,3,6],[1,4,7],[2,5,8],
+                                      [0,4,8],[2,4,6]]
+    
     func move(_ location: Move) -> Board {
         var tempPosition = position
         tempPosition[location] = turn
@@ -101,7 +105,6 @@ struct Board {
         }
     }
     
-    
     //MARK: Run minimax on every possible move to find the best one
     func findBestMove(_ board: Board) -> Move {
         var bestScore = Int.min
@@ -116,6 +119,42 @@ struct Board {
         return bestMove
     }
     
+    //MARK: Picks a random spot that is open
+    func easyMode(_ board: Board) -> Move {
+        var AImove = Int.random(in: 0..<9)
+        
+        while(position[AImove] != .E){
+            AImove = Int.random(in: 0..<9)
+        }
+        return AImove
+    }
+    
+    //MARK: IF CAN WIN, WIN
+    func mediumMode(_ board: Board) -> Move {
+        var AImove = Int.random(in: 0..<9)
+        
+        if position[4] == .E {
+            return 4
+        }
+        
+        while(position[AImove] != .E){
+            AImove = Int.random(in: 0..<9)
+        }
+        return AImove
+    }
+    
+    //MARK: IF CAN WIN, WIN, ELSE BLOCK
+    func hardMode(_ board: Board) -> Move {
+        var AImove = Int.random(in: 0..<9)
+        for _ in legalMoves {
+            if board.position[AImove] == .E {
+                return AImove
+            }
+            AImove = Int.random(in: 0..<9)
+        }
+        
+        return -1
+    }
 }
 
 
