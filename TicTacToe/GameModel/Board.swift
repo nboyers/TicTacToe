@@ -41,7 +41,10 @@ struct Board {
         self.lastMove = lastMove
     }
     
-    
+    var winPositions: Set<Set<Int>> = [ [0,1,2],[3,4,5],
+                                        [6,7,8],[0,3,6],
+                                        [1,4,7],[2,5,8],
+                                        [0,4,8],[2,4,6] ]
     var legalMoves: [Move] {
         return position.indices.filter { position[$0] == .E }
     }
@@ -86,9 +89,7 @@ struct Board {
                 let result = minimax(board.move(moveOption), maximizing: false, originalPlayer: originalPlayer, alpha: alpha,beta: beta)
                 bestScore = max(result, bestScore)
                 alpha = max(alpha, result)
-                if beta <= alpha {
-                    break
-                }
+                if beta <= alpha { break }
             }
             return bestScore
         } else { // minimizing
@@ -97,9 +98,7 @@ struct Board {
                 let result = minimax(board.move(moveOption), maximizing: true, originalPlayer: originalPlayer, alpha: alpha, beta: beta)
                 worstScore = min(result, worstScore)
                 beta = min(beta,worstScore)
-                if beta <= alpha {
-                    break
-                }
+                if beta <= alpha { break }
             }
             return worstScore
         }
@@ -123,37 +122,29 @@ struct Board {
     func easyMode(_ board: Board) -> Move {
         var AImove = Int.random(in: 0..<9)
         
-        while(position[AImove] != .E){
-            AImove = Int.random(in: 0..<9)
-        }
+        
+        while(position[AImove] != .E){ AImove = Int.random(in: 0..<9) }
         return AImove
     }
     
     //MARK: IF CAN WIN, WIN
     func mediumMode(_ board: Board) -> Move {
         var AImove = Int.random(in: 0..<9)
+        if position[4] == .E { return 4 }
         
-        if position[4] == .E {
-            return 4
-        }
         
-        while(position[AImove] != .E){
-            AImove = Int.random(in: 0..<9)
-        }
+        while(position[AImove] != .E){ AImove = Int.random(in: 0..<9) }
         return AImove
     }
     
     //MARK: IF CAN WIN, WIN, ELSE BLOCK
     func hardMode(_ board: Board) -> Move {
         var AImove = Int.random(in: 0..<9)
-        for _ in legalMoves {
-            if board.position[AImove] == .E {
-                return AImove
-            }
-            AImove = Int.random(in: 0..<9)
-        }
+        if position[4] == .E { return 4 }
         
-        return -1
+        
+        while(position[AImove] != .E){ AImove = Int.random(in: 0..<9) }
+        return AImove
     }
 }
 
