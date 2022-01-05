@@ -41,10 +41,10 @@ struct Board {
         self.lastMove = lastMove
     }
     
-    var winPositions: Set<Set<Int>> = [ [0,1,2],[3,4,5],
-                                        [6,7,8],[0,3,6],
-                                        [1,4,7],[2,5,8],
-                                        [0,4,8],[2,4,6] ]
+    var winPattern: Set<Set<Int>> = [ [0,1,2],[3,4,5],
+                                      [6,7,8],[0,3,6],
+                                      [1,4,7],[2,5,8],
+                                      [0,4,8],[2,4,6] ]
     var legalMoves: [Move] {
         return position.indices.filter { position[$0] == .E }
     }
@@ -63,10 +63,10 @@ struct Board {
         position[2] == position[4] && position[2] == position[6] && position[2] != .E    // diag 1
         
     }
-    var winPosition: Set<Set<Int>> = [[0,1,2],[3,4,5],[6,7,8],
-                                      [0,3,6],[1,4,7],[2,5,8],
-                                      [0,4,8],[2,4,6]]
-    
+    //    var winPosition: Set<Set<Int>> = [[0,1,2],[3,4,5],[6,7,8],
+    //                                      [0,3,6],[1,4,7],[2,5,8],
+    //                                      [0,4,8],[2,4,6]]
+    //
     func move(_ location: Move) -> Board {
         var tempPosition = position
         tempPosition[location] = turn
@@ -121,8 +121,6 @@ struct Board {
     //MARK: Picks a random spot that is open
     func easyMode(_ board: Board) -> Move {
         var AImove = Int.random(in: 0..<9)
-        
-        
         while(position[AImove] != .E){ AImove = Int.random(in: 0..<9) }
         return AImove
     }
@@ -132,8 +130,21 @@ struct Board {
         var AImove = Int.random(in: 0..<9)
         if position[4] == .E { return 4 }
         
+        let computerPostion = position.indices.filter { position[$0] == .O } // gets position
         
-        while(position[AImove] != .E){ AImove = Int.random(in: 0..<9) }
+        for i in computerPostion {
+            for move in legalMoves {
+                if computerPostion.count > 1 {
+                    if (computerPostion.firstIndex(of: i)! + computerPostion.index(after: i) + move) % 3 == 0 {
+                        return move
+                    }
+                } else {
+                    while(position[AImove] != .E){ AImove = Int.random(in: 0..<9) }
+                    return AImove
+                }
+            }
+        }
+        
         return AImove
     }
     
