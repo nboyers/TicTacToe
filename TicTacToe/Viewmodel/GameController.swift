@@ -19,7 +19,6 @@ class GameViewModel : ObservableObject {
     }
     
     //MARK: the legal moves in a position are all of the empty squares
-    
     func processGame(_ location: Move, diffculty: Int) {
         //FIXME: If user clicks on taken spot, app will choose next spot and disable the board, locking the entire thing
         if gameBoard.position[location] == .E {
@@ -35,15 +34,17 @@ class GameViewModel : ObservableObject {
             let computerMove = gameBoard.easyMode(gameBoard)
             updateUI(computerMove: computerMove)
             break
+            
         case 1:
             let computerMove = gameBoard.mediumMode(gameBoard)
             updateUI(computerMove: computerMove)
-    
             break
+            
         case 2:
             let computerMove = gameBoard.hardMode(gameBoard)
             updateUI(computerMove: computerMove)
             break
+            
         case 3:
             let computerMove = gameBoard.findBestMove(gameBoard)
             updateUI(computerMove: computerMove)
@@ -60,6 +61,7 @@ class GameViewModel : ObservableObject {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [self] in
             gameBoard = gameBoard.move(computerMove)
             if checkForGameOver(for: .O, in: gameBoard) {
+                isDisabled.toggle()
                 return
             }
             isDisabled.toggle()
@@ -73,10 +75,11 @@ class GameViewModel : ObservableObject {
         }
         if gameBoard.isWin {
             if piece == .X {
-            alertItem = AlertContext.humanWin
-            return true
+                alertItem = AlertContext.humanWin
+                return true
             } else {
                 alertItem = AlertContext.computerWin
+                return true
             }
         }
         
@@ -84,6 +87,8 @@ class GameViewModel : ObservableObject {
     }
     
     func resetGame() {
-        gameBoard =  Board(position: [.E, .E, .E, .E, .E, .E, .E, .E, .E], turn: .X, lastMove: -1)
+        gameBoard =  Board(position: [.E, .E, .E, .E, .E, .E, .E, .E, .E],
+                           turn: .X,
+                           lastMove: -1)
     }
 }

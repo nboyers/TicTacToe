@@ -32,7 +32,8 @@ enum Piece: String {
 struct Board {
     var position: [Piece]
     let turn: Piece
-    let lastMove: Move
+    let lastMove: Int
+    
     // by default the board is empty and X goes first
     // lastMove being -1 is a marker of a start position
     init(position: [Piece], turn: Piece, lastMove: Int) {
@@ -41,7 +42,7 @@ struct Board {
         self.lastMove = lastMove
     }
     
-    var legalMoves: [Move] {
+    var legalMoves: [Int] {
         return position.indices.filter { position[$0] == .E }
     }
     var isDraw: Bool {
@@ -59,10 +60,9 @@ struct Board {
         position[2] == position[4] && position[2] == position[6] && position[2] != .E    // diag 1
         
     }
-    //    var winPosition: Set<Set<Int>> = [[0,1,2],[3,4,5],[6,7,8],
-    //                                      [0,3,6],[1,4,7],[2,5,8],
-    //                                      [0,4,8],[2,4,6]]
-    //
+    let winPatterns: Set<Set<Int>> = [[0,1,2],[3,4,5],[6,7,8],
+                                      [0,3,6],[1,4,7],[2,5,8],
+                                      [0,4,8],[2,4,6]]
     func move(_ location: Move) -> Board {
         var tempPosition = position
         tempPosition[location] = turn
@@ -124,34 +124,50 @@ struct Board {
     //MARK: IF CAN WIN, WIN
     func mediumMode(_ board: Board) -> Move {
         var AImove = Int.random(in: 0..<9)
-        if position[4] == .E { return 4 }
-        
-        let computerPostion = position.indices.filter { position[$0] == .O } // gets position
-        
-        for i in computerPostion {
-            for move in legalMoves {
-                if computerPostion.count > 1 {
-                    if (computerPostion.firstIndex(of: i)! + computerPostion.index(after: i) + move) % 3 == 0 {
-                        return move
-                    }
-                } else {
-                    while(position[AImove] != .E){ AImove = Int.random(in: 0..<9) }
-                    return AImove
-                }
+        let computerMove = position.indices.filter { position[$0] == .O } // gets position
+        for pattern in winPatterns  {
+            let winPostion = pattern.subtracting(computerMove)
+            if winPostion.count == 1 {
+                let isOpen = isTaken(in: board, forIndex: winPostion.first!)
+                if isOpen  {  return winPostion.first! }
             }
         }
-        
+        while(position[AImove] != .E){ AImove = Int.random(in: 0..<9) }
         return AImove
     }
     
-    //MARK: IF CAN WIN, WIN, ELSE BLOCK
     func hardMode(_ board: Board) -> Move {
         var AImove = Int.random(in: 0..<9)
+        //MARK: TAKE MIDDLE IF OPEN
         if position[4] == .E { return 4 }
         
+        let computerMove = position.indices.filter { position[$0] == .O } // gets position
+        let blockHuman = position.indices.filter { position[$0] == .X }
         
+        for pattern in winPatterns  {
+            let winPostion = pattern.subtracting(computerMove)
+            if winPostion.count == 1 {
+                let isOpen = isTaken(in: board, forIndex: winPostion.first!)
+                if isOpen  {  return winPostion.first! }
+            }
+        }
+        
+        for pattern in winPatterns  {
+            let winPostion = pattern.subtracting(blockHuman)
+            if winPostion.count == 1 {
+                let isOpen = !isTaken(in: board, forIndex: winPostion.first!)
+                if isOpen  {  return winPostion.first! }
+            }
+        }
+        
+        
+        //MARK: OTHERIWSE RANDOM SPOT
         while(position[AImove] != .E){ AImove = Int.random(in: 0..<9) }
         return AImove
+    }
+    
+    private func isTaken(in moves: Board, forIndex index: Int) -> Bool {
+        return moves.legalMoves.contains(index)
     }
 }
 
