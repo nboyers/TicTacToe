@@ -124,11 +124,11 @@ struct Board {
     //MARK: IF CAN WIN, WIN
     func mediumMode(_ board: Board) -> Move {
         var AImove = Int.random(in: 0..<9)
-        let computerMove = position.indices.filter { position[$0] == .O } // gets position
+        let blockHuman = position.indices.filter { position[$0] == .X }
         for pattern in winPatterns  {
-            let winPostion = pattern.subtracting(computerMove)
+            let winPostion = pattern.subtracting(blockHuman)
             if winPostion.count == 1 {
-                let isOpen = isTaken(in: board, forIndex: winPostion.first!)
+                let isOpen = !isTaken(in: board, forIndex: winPostion.first!)
                 if isOpen  {  return winPostion.first! }
             }
         }

@@ -20,7 +20,6 @@ class GameViewModel : ObservableObject {
     
     //MARK: the legal moves in a position are all of the empty squares
     func processGame(_ location: Move, diffculty: Int) {
-        //FIXME: If user clicks on taken spot, app will choose next spot and disable the board, locking the entire thing
         if gameBoard.position[location] == .E {
             gameBoard = gameBoard.move(location)
             if checkForGameOver(for: .X, in: gameBoard) {
