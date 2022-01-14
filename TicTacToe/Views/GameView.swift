@@ -19,7 +19,14 @@ struct GameView: View {
     var body: some View {
         GeometryReader { geometry in
             VStack {
-                Spacer()
+                Group {
+                    Text("Win Rate")
+                        .font(.title)
+                        
+                    Text("\(viewModel.winRate)%")
+                        .font(.title)
+                        .padding(.bottom, geometry.size.height/200)
+                }
                 LazyVGrid(columns: column, spacing: 5) {
                     ForEach(0..<9) { i in
                         ZStack {
@@ -31,7 +38,35 @@ struct GameView: View {
                     }
                 }
                 
-                Spacer()
+                HStack {
+                    Spacer()
+                    Text("Player Win")
+                        .font(.title2)
+                        .offset(y: 50)
+                    Spacer()
+                    
+                    Text("Computer Win")
+                        .font(.title2)
+                        .offset(y: 50)
+                    Spacer()
+                    
+                }
+                HStack {
+                    Spacer()
+                    Text("\(viewModel.humanWin)")
+                        .offset(x:-25,y: 70)
+                        .font(.title)
+                        .padding(.bottom, 150)
+                    Spacer()
+                    
+                    
+                    Text("\(viewModel.computerWin)")
+                        .offset(y: 70)
+                        .font(.title)
+                        .padding(.bottom, 150)
+                    Spacer()
+                }
+                 Spacer()
             }.disabled(viewModel.isDisabled)
                 .padding()
                 .alert(item: $viewModel.alertItem, content: { alertItem in
@@ -42,6 +77,8 @@ struct GameView: View {
         }
     }
 }
+
+
 struct GameCircleView: View {
     var proxy : GeometryProxy
     var body: some View {
@@ -63,7 +100,6 @@ struct PlayerIndicator: View {
 
 
 struct ContentView_Previews: PreviewProvider {
-    
     static var previews: some View {
         GameView(difficulty: -1)
     }
