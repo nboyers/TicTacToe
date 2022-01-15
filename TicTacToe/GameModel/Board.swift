@@ -121,52 +121,62 @@ struct Board {
         return AImove
     }
     
-    //MARK: IF CAN WIN, WIN
+    //MARK: IF CAN Block Block
     func mediumMode(_ board: Board) -> Move {
         var AImove = Int.random(in: 0..<9)
-        let blockHuman = position.indices.filter { position[$0] == .X }
+        if position[4] == .E { return 4 }
+        let blockHuman = position.indices.filter { position[$0] == .X }   // Gets Human Postion
         for pattern in winPatterns  {
-            let winPostion = pattern.subtracting(blockHuman)
-            if winPostion.count == 1 {
-                let isOpen = !isTaken(in: board, forIndex: winPostion.first!)
-                if isOpen  {  return winPostion.first! }
+            let blockPostion = pattern.subtracting(blockHuman)
+            if blockPostion.count == 1 {
+                let isOpen = isAvailable(in: board, forIndex: blockPostion.first!)
+                if isOpen  {
+                    return blockPostion.first!
+                }
             }
+            
         }
         while(position[AImove] != .E){ AImove = Int.random(in: 0..<9) }
         return AImove
     }
     
+    //MARK: IF Center open, take it-> If Win, Win, else block-> otherwise random
     func hardMode(_ board: Board) -> Move {
         var AImove = Int.random(in: 0..<9)
-        //MARK: TAKE MIDDLE IF OPEN
+        
+        //Takes middle if open
         if position[4] == .E { return 4 }
         
-        let computerMove = position.indices.filter { position[$0] == .O } // gets position
-        let blockHuman = position.indices.filter { position[$0] == .X }
+        let computerMove = position.indices.filter { position[$0] == .O } // Gets Computer position
+        let blockHuman = position.indices.filter { position[$0] == .X }   // Gets Human Postion
         
         for pattern in winPatterns  {
             let winPostion = pattern.subtracting(computerMove)
             if winPostion.count == 1 {
-                let isOpen = isTaken(in: board, forIndex: winPostion.first!)
-                if isOpen  {  return winPostion.first! }
+                let isOpen = isAvailable(in: board, forIndex: winPostion.first!)
+                if isOpen  {
+                    return winPostion.first!
+                }
             }
         }
         
         for pattern in winPatterns  {
-            let winPostion = pattern.subtracting(blockHuman)
-            if winPostion.count == 1 {
-                let isOpen = !isTaken(in: board, forIndex: winPostion.first!)
-                if isOpen  {  return winPostion.first! }
+            let blockPostion = pattern.subtracting(blockHuman)
+            if blockPostion.count == 1 {
+                let isOpen = isAvailable(in: board, forIndex: blockPostion.first!)
+                if isOpen  {
+                    return blockPostion.first!
+                }
             }
+            
         }
         
-        
-        //MARK: OTHERIWSE RANDOM SPOT
         while(position[AImove] != .E){ AImove = Int.random(in: 0..<9) }
         return AImove
     }
     
-    private func isTaken(in moves: Board, forIndex index: Int) -> Bool {
+    // MARK: Checks if spot is open returns true if it is; false if it is not open
+    private func isAvailable(in moves: Board, forIndex index: Int) -> Bool {
         return moves.legalMoves.contains(index)
     }
 }
