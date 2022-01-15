@@ -16,10 +16,10 @@ class GameViewModel : ObservableObject {
     @Published var alertItem: AlertItem?
     @Published var humanWin: Int  = 0
     @Published var computerWin: Int  = 0
-    @Published var winRate: Double = 0
-    @Published private var numberOfGames: Double   = 0
+    @Published var formattedWinRate: String = "0"
+    private var numberOfGames: Double = 0
+    private var winRate: Double = 0
     
-
     init(position: [Piece], turn: Piece, lastMove: Int) {
         gameBoard = Board(position: position, turn: turn, lastMove: lastMove)
     }
@@ -73,23 +73,23 @@ class GameViewModel : ObservableObject {
     
     func checkForGameOver(for piece: Piece, in moves: Board) -> Bool {
         if gameBoard.isDraw {
-            numberOfGames+=1
-            winRate = ((Double(humanWin) / numberOfGames) * 100)
             alertItem = AlertContext.draw
             return true
         }
         
         if gameBoard.isWin {
-            if piece == .X {
+            if piece == .X { // human
                 numberOfGames+=1
                 humanWin+=1
                 winRate = ((Double(humanWin) / numberOfGames) * 100)
+                formattedWinRate =  String(format: "%.0f", winRate)
                 alertItem = AlertContext.humanWin
                 return true
-            } else {
+            } else { // computer
                 numberOfGames+=1
                 computerWin+=1
                 winRate = ((Double(humanWin) / numberOfGames) * 100)
+                formattedWinRate =  String(format: "%.0f", winRate)
                 alertItem = AlertContext.computerWin
                 return true
             }

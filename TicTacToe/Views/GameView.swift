@@ -23,7 +23,7 @@ struct GameView: View {
                     Text("Win Rate")
                         .font(.title)
                         
-                    Text("\(viewModel.winRate)%")
+                    Text("\(viewModel.formattedWinRate)%")
                         .font(.title)
                         .padding(.bottom, geometry.size.height/200)
                 }
