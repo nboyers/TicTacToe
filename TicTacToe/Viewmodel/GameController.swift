@@ -26,11 +26,14 @@ class GameViewModel : ObservableObject {
     
     //MARK: the legal moves in a position are all of the empty squares
     func processGame(_ location: Move, diffculty: Int) {
+        
+        //Human move
         if gameBoard.position[location] == .E {
             gameBoard = gameBoard.move(location)
             if checkForGameOver(for: .X, in: gameBoard) { return }
-            isDisabled.toggle()
         }
+        
+        isDisabled = true //Disables the board
         
         switch(diffculty) {
         case 0:
@@ -61,19 +64,17 @@ class GameViewModel : ObservableObject {
     }
     
     private func updateUI(computerMove: Int) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) { [self] in
             gameBoard = gameBoard.move(computerMove)
-            if checkForGameOver(for: .O, in: gameBoard) {
-                isDisabled.toggle()
-                return
-            }
-            isDisabled.toggle()
+            if checkForGameOver(for: .O, in: gameBoard) { return }
         }
+        isDisabled = false
     }
     
     func checkForGameOver(for piece: Piece, in moves: Board) -> Bool {
         if gameBoard.isDraw {
             alertItem = AlertContext.draw
+            isDisabled = false
             return true
         }
         
@@ -84,6 +85,7 @@ class GameViewModel : ObservableObject {
                 winRate = ((Double(humanWin) / numberOfGames) * 100)
                 formattedWinRate =  String(format: "%.0f", winRate)
                 alertItem = AlertContext.humanWin
+                isDisabled = false
                 return true
             } else { // computer
                 numberOfGames+=1
@@ -91,10 +93,10 @@ class GameViewModel : ObservableObject {
                 winRate = ((Double(humanWin) / numberOfGames) * 100)
                 formattedWinRate =  String(format: "%.0f", winRate)
                 alertItem = AlertContext.computerWin
+                isDisabled = false
                 return true
             }
         }
-        
         return false
     }
     

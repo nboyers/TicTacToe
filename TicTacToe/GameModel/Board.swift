@@ -4,7 +4,6 @@
 //
 //  Created by Noah Boyers on 12/14/21.
 //
-
 import Foundation
 
 // a move is an integer 0-8 indicating a place to put a piece
@@ -124,6 +123,8 @@ struct Board {
     //MARK: IF CAN Block Block
     func mediumMode(_ board: Board) -> Move {
         var AImove = Int.random(in: 0..<9)
+        
+        //Takes middle if open
         if position[4] == .E { return 4 }
         let blockHuman = position.indices.filter { position[$0] == .X }   // Gets Human Postion
         for pattern in winPatterns  {
