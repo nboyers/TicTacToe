@@ -74,6 +74,7 @@
    </AnalyzeAction>
    <ArchiveAction
       buildConfiguration = "Release"
+      customArchiveName = "Tic-Tak-Toe"
       revealArchiveInOrganizer = "YES">
    </ArchiveAction>
 </Scheme>

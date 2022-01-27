@@ -35,7 +35,11 @@ struct GameView: View {
                         }.onTapGesture {
                             viewModel.processGame(i, diffculty: difficulty)
                         }
-                    }
+                    }.alert(item: $viewModel.alertItem, content: { alertItem in
+                        Alert(title: alertItem.title,
+                              message: alertItem.message,
+                              dismissButton: .default(viewModel.alertItem!.buttonTitle))
+                    })
                 }
                 
                 HStack {
