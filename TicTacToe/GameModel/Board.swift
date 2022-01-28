@@ -87,6 +87,7 @@ struct Board {
                 if beta <= alpha { break }
             }
             return bestScore
+            
         } else { // minimizing
             var worstScore = Int.max
             for moveOption in board.legalMoves {

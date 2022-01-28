@@ -36,8 +36,8 @@ class GameViewModel : ObservableObject {
         
         //Computer Move
         switch(diffculty) {
-        case 0:
             
+        case 0:
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.50) { [self] in
                 let computerMove = gameBoard.easyMode(gameBoard)
                 gameBoard = gameBoard.move(computerMove)
@@ -47,7 +47,6 @@ class GameViewModel : ObservableObject {
             break
             
         case 1:
-            
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.50) { [self] in
                 let computerMove = gameBoard.mediumMode(gameBoard)
                 gameBoard = gameBoard.move(computerMove)
@@ -57,7 +56,6 @@ class GameViewModel : ObservableObject {
             break
             
         case 2:
-            
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.50) { [self] in
                 let computerMove = gameBoard.hardMode(gameBoard)
                 gameBoard = gameBoard.move(computerMove)
@@ -76,7 +74,6 @@ class GameViewModel : ObservableObject {
             break
             
         default:
-            
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.50) { [self] in
                 let computerMove = gameBoard.easyMode(gameBoard)
                 gameBoard = gameBoard.move(computerMove)
@@ -113,11 +110,8 @@ class GameViewModel : ObservableObject {
     }
     
     func resetGame() {
-        if gameBoard.isWin || gameBoard.isDraw {
             gameBoard =  Board(position: [.E, .E, .E, .E, .E, .E, .E, .E, .E],
                                turn: .X,
                                lastMove: -1)
-        }
-        isDisabled = false
     }
 }

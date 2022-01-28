@@ -26,9 +26,4 @@ struct AlertContext {
     static let draw        = AlertItem(title: Text("Draw"),
                                        message: Text("At least you didn't lose"),
                                        buttonTitle: Text("Play Again"))
-    
-    static let inValidMove = AlertItem(title: Text("Invalid Move"),
-                                         message: Text("This spot is taken"),
-                                         buttonTitle: Text("Try Again"))
-      
 }
