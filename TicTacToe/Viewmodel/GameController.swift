@@ -4,7 +4,6 @@
 //
 //  Created by Noah Boyers on 12/24/21.
 //
-
 import Foundation
 import SwiftUI
 
@@ -27,52 +26,66 @@ class GameViewModel : ObservableObject {
     //MARK: the legal moves in a position are all of the empty squares
     func processGame(_ location: Move, diffculty: Int) {
         //Human move
-        if gameBoard.position[location] == .E {
-            isDisabled.toggle()
-            gameBoard = gameBoard.move(location)
-            if checkForGameOver(for: .X, in: gameBoard) { return }
-        } else {
-            alertItem = AlertContext.inValidMove
-           return
-        }
+        if !gameBoard.isAvailable(in: gameBoard, forIndex: location) { return }
         
+        gameBoard = gameBoard.move(location)
         
+        if checkForGameOver(for: .X, in: gameBoard) { return }
+        
+        isDisabled = true
+        
+        //Computer Move
         switch(diffculty) {
         case 0:
-            let computerMove = gameBoard.easyMode(gameBoard)
-            updateUI(computerMove: computerMove)
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.50) { [self] in
+                let computerMove = gameBoard.easyMode(gameBoard)
+                gameBoard = gameBoard.move(computerMove)
+                if checkForGameOver(for: .O, in: gameBoard) { return }
+                isDisabled = false
+            }
             break
             
         case 1:
-            let computerMove = gameBoard.mediumMode(gameBoard)
-            updateUI(computerMove: computerMove)
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.50) { [self] in
+                let computerMove = gameBoard.mediumMode(gameBoard)
+                gameBoard = gameBoard.move(computerMove)
+                if checkForGameOver(for: .O, in: gameBoard) { return }
+                isDisabled = false
+            }
             break
             
         case 2:
-            let computerMove = gameBoard.hardMode(gameBoard)
-            updateUI(computerMove: computerMove)
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.50) { [self] in
+                let computerMove = gameBoard.hardMode(gameBoard)
+                gameBoard = gameBoard.move(computerMove)
+                if checkForGameOver(for: .O, in: gameBoard) { return }
+                isDisabled = false
+            }
             break
             
         case 3:
-            let computerMove = gameBoard.findBestMove(gameBoard)
-            updateUI(computerMove: computerMove)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.50) { [self] in
+                let computerMove = gameBoard.findBestMove(gameBoard)
+                gameBoard = gameBoard.move(computerMove)
+                if checkForGameOver(for: .O, in: gameBoard) { return }
+                isDisabled = false
+            }
             break
             
         default:
-            let computerMove = gameBoard.easyMode(gameBoard)
-            updateUI(computerMove: computerMove)
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.50) { [self] in
+                let computerMove = gameBoard.easyMode(gameBoard)
+                gameBoard = gameBoard.move(computerMove)
+                if checkForGameOver(for: .O, in: gameBoard) { return }
+                isDisabled = false
+            }
             break
         }
     }
-    
-    private func updateUI(computerMove: Int) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.50) { [self] in
-            gameBoard = gameBoard.move(computerMove)
-            if checkForGameOver(for: .O, in: gameBoard) { return }
-            isDisabled.toggle()
-        }
-    }
-    
     func checkForGameOver(for piece: Piece, in moves: Board) -> Bool {
         if gameBoard.isDraw {
             alertItem = AlertContext.draw

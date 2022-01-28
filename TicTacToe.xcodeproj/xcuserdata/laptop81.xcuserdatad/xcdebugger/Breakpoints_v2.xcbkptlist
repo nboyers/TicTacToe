@@ -30,10 +30,10 @@
             filePath = "TicTacToe/Viewmodel/GameController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "28"
-            endingLineNumber = "28"
-            landmarkName = "processGame(_:diffculty:)"
-            landmarkType = "7">
+            startingLineNumber = "27"
+            endingLineNumber = "27"
+            landmarkName = "the legal moves in a position are all of the empty squares"
+            landmarkType = "19">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -302,8 +302,8 @@
             filePath = "TicTacToe/Viewmodel/GameController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "91"
-            endingLineNumber = "91"
+            startingLineNumber = "104"
+            endingLineNumber = "104"
             landmarkName = "checkForGameOver(for:in:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -318,8 +318,8 @@
             filePath = "TicTacToe/Viewmodel/GameController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "87"
-            endingLineNumber = "87"
+            startingLineNumber = "100"
+            endingLineNumber = "100"
             landmarkName = "checkForGameOver(for:in:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -334,8 +334,8 @@
             filePath = "TicTacToe/Viewmodel/GameController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "27"
-            endingLineNumber = "27"
+            startingLineNumber = "26"
+            endingLineNumber = "26"
             landmarkName = "GameViewModel"
             landmarkType = "3">
          </BreakpointContent>
@@ -343,15 +343,15 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "30082EE6-7AE5-4BC1-936E-43AC42D4D3A7"
+            uuid = "E7B7FCD3-F7B8-445D-B4F6-D411368B67ED"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "TicTacToe/Viewmodel/GameController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "36"
-            endingLineNumber = "36"
+            startingLineNumber = "29"
+            endingLineNumber = "29"
             landmarkName = "processGame(_:diffculty:)"
             landmarkType = "7">
          </BreakpointContent>

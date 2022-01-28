@@ -177,7 +177,7 @@ struct Board {
     }
     
     // MARK: Checks if spot is open returns true if it is; false if it is not open
-    private func isAvailable(in moves: Board, forIndex index: Int) -> Bool {
+    func isAvailable(in moves: Board, forIndex index: Int) -> Bool {
         return moves.legalMoves.contains(index)
     }
 }
