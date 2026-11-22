@@ -9,9 +9,23 @@ import SwiftUI
 
 @main
 struct TicTacToeApp: App {
+    @StateObject private var progress: ProgressStore
+    @StateObject private var store: StoreManager
+    @StateObject private var ads = AdManager()
+    
+    init() {
+        // The store needs the progress store to deliver purchases
+        let progress = ProgressStore()
+        _progress = StateObject(wrappedValue: progress)
+        _store = StateObject(wrappedValue: StoreManager(progress: progress))
+    }
+    
     var body: some Scene {
         WindowGroup {
             MainMenuView()
+                .environmentObject(progress)
+                .environmentObject(store)
+                .environmentObject(ads)
         }
     }
 }

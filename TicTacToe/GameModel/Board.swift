@@ -62,6 +62,16 @@ struct Board {
     let winPatterns: Set<Set<Int>> = [[0,1,2],[3,4,5],[6,7,8],
                                       [0,3,6],[1,4,7],[2,5,8],
                                       [0,4,8],[2,4,6]]
+    
+    // The three squares that make up the winning line, used to highlight a win
+    var winningLine: [Int]? {
+        for pattern in winPatterns {
+            let squares = pattern.sorted()
+            let piece = position[squares[0]]
+            if piece != .E && squares.allSatisfy({ position[$0] == piece }) { return squares }
+        }
+        return nil
+    }
     func move(_ location: Move) -> Board {
         var tempPosition = position
         tempPosition[location] = turn
