@@ -13,12 +13,16 @@ enum StoreProduct: String, CaseIterable {
     case removeAds = "frent.nobos.TicTacToe.removeads"
     case coins500 = "frent.nobos.TicTacToe.coins500"
     case coins1500 = "frent.nobos.TicTacToe.coins1500"
+    case coins5000 = "frent.nobos.TicTacToe.coins5000"
+    case coins15000 = "frent.nobos.TicTacToe.coins15000"
     
     var coinAmount: Int {
         switch self {
         case .removeAds: return 0
         case .coins500: return 500
-        case .coins1500: return 1500
+        case .coins1500: return 1_500
+        case .coins5000: return 5_000
+        case .coins15000: return 15_000
         }
     }
 }
@@ -64,21 +68,35 @@ final class StoreManager: ObservableObject {
     func purchase(_ product: Product) async {
         isPurchasing = true
         defer { isPurchasing = false }
+        AppAnalytics.shared.log(AnalyticsEvent.purchaseStart, ["product_id": product.id])
         do {
             switch try await product.purchase() {
             case .success(let verification):
                 await handle(verification)
-            case .userCancelled, .pending:
-                break
+                if case .verified = verification {
+                    AppAnalytics.shared.log(AnalyticsEvent.purchase, [
+                        "product_id": product.id,
+                        "value": NSDecimalNumber(decimal: product.price).doubleValue,
+                        "currency": product.priceFormatStyle.currencyCode
+                    ])
+                } else {
+                    AppAnalytics.shared.log(AnalyticsEvent.purchaseFailed, ["product_id": product.id, "reason": "unverified"])
+                }
+            case .userCancelled:
+                AppAnalytics.shared.log(AnalyticsEvent.purchaseCancelled, ["product_id": product.id])
+            case .pending:
+                AppAnalytics.shared.log(AnalyticsEvent.purchaseCancelled, ["product_id": product.id, "reason": "pending"])
             @unknown default:
                 break
             }
         } catch {
+            AppAnalytics.shared.log(AnalyticsEvent.purchaseFailed, ["product_id": product.id, "reason": "error"])
             errorMessage = "Purchase failed. You have not been charged."
         }
     }
     
     func restorePurchases() async {
+        AppAnalytics.shared.log(AnalyticsEvent.restorePurchases)
         do {
             try await AppStore.sync()
             await refreshEntitlements()
@@ -99,13 +117,12 @@ final class StoreManager: ObservableObject {
     
     private func handle(_ result: VerificationResult<Transaction>) async {
         guard case .verified(let transaction) = result else { return }
-        switch StoreProduct(rawValue: transaction.productID) {
-        case .removeAds:
-            progress.setAdsRemoved()
-        case .coins500, .coins1500:
-            progress.add(coins: StoreProduct(rawValue: transaction.productID)?.coinAmount ?? 0)
-        case nil:
-            break
+        if let product = StoreProduct(rawValue: transaction.productID) {
+            if product == .removeAds {
+                progress.setAdsRemoved()
+            } else {
+                progress.add(coins: product.coinAmount)
+            }
         }
         await transaction.finish() // only after the goods are delivered
     }

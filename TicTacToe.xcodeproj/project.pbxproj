@@ -19,6 +19,13 @@
 		970C877C30B3941A00BB75AD /* LeaderboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 970C877B30B3941A00BB75AD /* LeaderboardView.swift */; };
 		970C877E30B394F600BB75AD /* PieceSkin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 970C877D30B394F600BB75AD /* PieceSkin.swift */; };
 		970C878030B394F800BB75AD /* Boost.swift in Sources */ = {isa = PBXBuildFile; fileRef = 970C877F30B394F800BB75AD /* Boost.swift */; };
+		97D3D98730B9D204000530D0 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 97D3D98630B9D204000530D0 /* PrivacyInfo.xcprivacy */; };
+		97D3D98A30B9D235000530D0 /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = 97D3D98930B9D235000530D0 /* GoogleMobileAds */; };
+		97D3D98D30B9D248000530D0 /* GoogleUserMessagingPlatform in Frameworks */ = {isa = PBXBuildFile; productRef = 97D3D98C30B9D248000530D0 /* GoogleUserMessagingPlatform */; };
+		97D3D98F30B9D484000530D0 /* VanishBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97D3D98E30B9D484000530D0 /* VanishBoard.swift */; };
+		97D3D99130B9D4B4000530D0 /* TutorialView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97D3D99030B9D4B4000530D0 /* TutorialView.swift */; };
+		97D3D99530B9D657000530D0 /* Economy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97D3D99430B9D657000530D0 /* Economy.swift */; };
+		97D3D99730B9D897000530D0 /* PlayerTitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97D3D99630B9D897000530D0 /* PlayerTitle.swift */; };
 		DF64F47B26792D3B008FF24D /* TicTacToeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF64F47A26792D3B008FF24D /* TicTacToeApp.swift */; };
 		DF64F47D26792D3B008FF24D /* GameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF64F47C26792D3B008FF24D /* GameView.swift */; };
 		DF64F47F26792D3D008FF24D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DF64F47E26792D3D008FF24D /* Assets.xcassets */; };
@@ -41,8 +48,14 @@
 		970C877730B391F000BB75AD /* UltimateBoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UltimateBoardView.swift; sourceTree = "<group>"; };
 		970C877930B393FA00BB75AD /* Leaderboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Leaderboard.swift; sourceTree = "<group>"; };
 		970C877B30B3941A00BB75AD /* LeaderboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeaderboardView.swift; sourceTree = "<group>"; };
-		970C877D30B394F600BB75AD /* PieceSkin.swift */ = {isa = PBXFileReference; path = PieceSkin.swift; sourceTree = "<group>"; };
-		970C877F30B394F800BB75AD /* Boost.swift */ = {isa = PBXFileReference; path = Boost.swift; sourceTree = "<group>"; };
+		970C877D30B394F600BB75AD /* PieceSkin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PieceSkin.swift; sourceTree = "<group>"; };
+		970C877F30B394F800BB75AD /* Boost.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Boost.swift; sourceTree = "<group>"; };
+		97D3D98630B9D204000530D0 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		97D3D98E30B9D484000530D0 /* VanishBoard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VanishBoard.swift; sourceTree = "<group>"; };
+		97D3D99030B9D4B4000530D0 /* TutorialView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialView.swift; sourceTree = "<group>"; };
+		97D3D99430B9D657000530D0 /* Economy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Economy.swift; sourceTree = "<group>"; };
+		97D3D99630B9D897000530D0 /* PlayerTitle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerTitle.swift; sourceTree = "<group>"; };
+		97D3D99A30B9DA2C000530D0 /* TicTacToe.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TicTacToe.entitlements; sourceTree = "<group>"; };
 		DF64F47726792D3B008FF24D /* TicTacToe.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TicTacToe.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DF64F47A26792D3B008FF24D /* TicTacToeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TicTacToeApp.swift; sourceTree = "<group>"; };
 		DF64F47C26792D3B008FF24D /* GameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameView.swift; sourceTree = "<group>"; };
@@ -65,6 +78,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				97D3D98D30B9D248000530D0 /* GoogleUserMessagingPlatform in Frameworks */,
+				97D3D98A30B9D235000530D0 /* GoogleMobileAds in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -90,6 +105,7 @@
 		DF64F47926792D3B008FF24D /* TicTacToe */ = {
 			isa = PBXGroup;
 			children = (
+				97D3D99A30B9DA2C000530D0 /* TicTacToe.entitlements */,
 				DFB86874277CF787006BFE2F /* Extensions */,
 				DFFC684D27641AA30038DDD0 /* GameModel */,
 				DFFC684F27641AE30038DDD0 /* Viewmodel */,
@@ -128,6 +144,9 @@
 				970C877930B393FA00BB75AD /* Leaderboard.swift */,
 				970C877D30B394F600BB75AD /* PieceSkin.swift */,
 				970C877F30B394F800BB75AD /* Boost.swift */,
+				97D3D98E30B9D484000530D0 /* VanishBoard.swift */,
+				97D3D99430B9D657000530D0 /* Economy.swift */,
+				97D3D99630B9D897000530D0 /* PlayerTitle.swift */,
 			);
 			path = GameModel;
 			sourceTree = "<group>";
@@ -138,6 +157,7 @@
 				DF64F47A26792D3B008FF24D /* TicTacToeApp.swift */,
 				DF64F47E26792D3D008FF24D /* Assets.xcassets */,
 				DF64F48326792D3D008FF24D /* Info.plist */,
+				97D3D98630B9D204000530D0 /* PrivacyInfo.xcprivacy */,
 			);
 			path = Supporting;
 			sourceTree = "<group>";
@@ -161,6 +181,7 @@
 				970C877330B390F500BB75AD /* GameStyle.swift */,
 				970C877730B391F000BB75AD /* UltimateBoardView.swift */,
 				970C877B30B3941A00BB75AD /* LeaderboardView.swift */,
+				97D3D99030B9D4B4000530D0 /* TutorialView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -184,6 +205,10 @@
 				970C876630B38F2300BB75AD /* Services */,
 			);
 			name = TicTacToe;
+			packageProductDependencies = (
+				97D3D98930B9D235000530D0 /* GoogleMobileAds */,
+				97D3D98C30B9D248000530D0 /* GoogleUserMessagingPlatform */,
+			);
 			productName = TicTacToe;
 			productReference = DF64F47726792D3B008FF24D /* TicTacToe.app */;
 			productType = "com.apple.product-type.application";
@@ -212,6 +237,10 @@
 				Base,
 			);
 			mainGroup = DF64F46E26792D3B008FF24D;
+			packageReferences = (
+				97D3D98830B9D235000530D0 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */,
+				97D3D98B30B9D248000530D0 /* XCRemoteSwiftPackageReference "swift-package-manager-google-user-messaging-platform" */,
+			);
 			productRefGroup = DF64F47826792D3B008FF24D /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -226,6 +255,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				97D3D98730B9D204000530D0 /* PrivacyInfo.xcprivacy in Resources */,
 				DF64F48226792D3D008FF24D /* Preview Assets.xcassets in Resources */,
 				DF64F47F26792D3D008FF24D /* Assets.xcassets in Resources */,
 			);
@@ -241,8 +271,11 @@
 				970C877C30B3941A00BB75AD /* LeaderboardView.swift in Sources */,
 				970C877830B391F000BB75AD /* UltimateBoardView.swift in Sources */,
 				DFFC685227641C310038DDD0 /* MainMenuView.swift in Sources */,
+				97D3D99730B9D897000530D0 /* PlayerTitle.swift in Sources */,
 				970C878030B394F800BB75AD /* Boost.swift in Sources */,
 				DFB86876277CF79D006BFE2F /* Shape+extension.swift in Sources */,
+				97D3D98F30B9D484000530D0 /* VanishBoard.swift in Sources */,
+				97D3D99530B9D657000530D0 /* Economy.swift in Sources */,
 				970C877030B38F5800BB75AD /* ShopView.swift in Sources */,
 				DFD0CAE82776793F00B740A7 /* GameController.swift in Sources */,
 				970C876E30B38F5300BB75AD /* AdPlaceholderView.swift in Sources */,
@@ -254,6 +287,7 @@
 				DF64F48A267A5885008FF24D /* Alerts.swift in Sources */,
 				970C876330B38F1100BB75AD /* BoardTheme.swift in Sources */,
 				970C877630B391DC00BB75AD /* UltimateBoard.swift in Sources */,
+				97D3D99130B9D4B4000530D0 /* TutorialView.swift in Sources */,
 				970C877E30B394F600BB75AD /* PieceSkin.swift in Sources */,
 				DF64F47B26792D3B008FF24D /* TicTacToeApp.swift in Sources */,
 				970C876530B38F1700BB75AD /* Achievement.swift in Sources */,
@@ -390,6 +424,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = TicTacToe/TicTacToe.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"TicTacToe/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
@@ -413,6 +448,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = TicTacToe/TicTacToe.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"TicTacToe/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
@@ -453,6 +489,38 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		97D3D98830B9D235000530D0 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/googleads/swift-package-manager-google-mobile-ads.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 13.13.0;
+			};
+		};
+		97D3D98B30B9D248000530D0 /* XCRemoteSwiftPackageReference "swift-package-manager-google-user-messaging-platform" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/googleads/swift-package-manager-google-user-messaging-platform.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.1.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		97D3D98930B9D235000530D0 /* GoogleMobileAds */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 97D3D98830B9D235000530D0 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */;
+			productName = GoogleMobileAds;
+		};
+		97D3D98C30B9D248000530D0 /* GoogleUserMessagingPlatform */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 97D3D98B30B9D248000530D0 /* XCRemoteSwiftPackageReference "swift-package-manager-google-user-messaging-platform" */;
+			productName = GoogleUserMessagingPlatform;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = DF64F46F26792D3B008FF24D /* Project object */;
 }

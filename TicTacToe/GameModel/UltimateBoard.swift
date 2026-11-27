@@ -38,6 +38,13 @@ struct UltimateBoard: Equatable {
     
     init() {}
     
+    /// A ready-made position showing decided mini-boards, used by the tutorial
+    static func demo(results: [Int: MiniResult]) -> UltimateBoard {
+        var board = UltimateBoard()
+        for (index, result) in results { board.results[index] = result }
+        return board
+    }
+    
     func piece(board: Int, cell: Int) -> Piece {
         cells[board * 9 + cell]
     }

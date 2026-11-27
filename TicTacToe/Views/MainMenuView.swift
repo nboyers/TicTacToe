@@ -18,6 +18,7 @@ struct MainMenuView: View {
     @State private var showProgress = false
     @State private var showRanks = false
     @State private var showDaily = false
+    @State private var tutorialVariant: GameVariant?
     
     private let modes: [(mode: GameMode, icon: String, palette: ButtonPalette)] = [
         (.computer(difficulty: 0), "tortoise.fill", .green),
@@ -61,7 +62,11 @@ struct MainMenuView: View {
             .sheet(isPresented: $showShop) { ShopView() }
             .sheet(isPresented: $showProgress) { AchievementsView() }
             .sheet(isPresented: $showRanks) { LeaderboardView() }
-            .onAppear { progress.refreshWeek() }
+            .fullScreenCover(item: $tutorialVariant) { variant in TutorialView(variant: variant) }
+            .onAppear {
+                progress.refreshWeek()
+                AppAnalytics.shared.screen("menu")
+            }
         }
         .fullScreenCover(item: $ads.presented) { kind in
             AdPlaceholderView(kind: kind) { earned in
@@ -74,6 +79,27 @@ struct MainMenuView: View {
     private var topHUD: some View {
         HStack(spacing: 10) {
             LevelBadge(level: progress.level, progress: progress.levelProgress)
+            
+            // Status the player has earned or bought, shown where everyone can see it
+            VStack(alignment: .leading, spacing: 3) {
+                if let title = progress.title {
+                    HStack(spacing: 4) {
+                        Image(systemName: title.icon)
+                        Text(title.name.uppercased())
+                    }
+                    .font(gameFont(11, weight: .black))
+                    .foregroundColor(GamePalette.goldEdge)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(Capsule().fill(GamePalette.gold))
+                }
+                if progress.collectorRank > 0 {
+                    Label("COLLECTOR \(progress.collectorRank)", systemImage: "crown.fill")
+                        .font(gameFont(10, weight: .black))
+                        .foregroundColor(GamePalette.gold)
+                }
+            }
+            .lineLimit(1)
             
             Spacer()
             
@@ -136,9 +162,24 @@ struct MainMenuView: View {
     
     // MARK: Variant
     private var variantPicker: some View {
-        HStack(spacing: 10) {
-            variantButton(title: "CLASSIC", subtitle: "3×3", variant: .classic, palette: .blue)
-            variantButton(title: "ULTIMATE", subtitle: "9×9 STRATEGY", variant: .ultimate, palette: .purple)
+        VStack(spacing: 8) {
+            HStack(spacing: 8) {
+                variantButton(title: "CLASSIC", subtitle: "3×3", variant: .classic, palette: .blue)
+                variantButton(title: "VANISH", subtitle: "3 MARKS", variant: .vanish, palette: .orange)
+                variantButton(title: "ULTIMATE", subtitle: "9×9", variant: .ultimate, palette: .purple)
+            }
+            
+            if selectedVariant != .classic {
+                Button { tutorialVariant = selectedVariant } label: {
+                    Label("HOW TO PLAY \(selectedVariant.name.uppercased())", systemImage: "questionmark.circle.fill")
+                        .font(gameFont(13))
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 5)
+                        .background(Capsule().fill(Color.black.opacity(0.35)))
+                }
+                .buttonStyle(.plain)
+            }
         }
     }
     
@@ -149,17 +190,21 @@ struct MainMenuView: View {
             withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) { selectedVariant = variant }
         } label: {
             VStack(spacing: 0) {
-                Text(title).font(gameFont(18, weight: .black))
+                Text(title)
+                    .font(gameFont(16, weight: .black))
+                    .minimumScaleFactor(0.7)
+                    .lineLimit(1)
                 Text(subtitle).font(gameFont(10)).opacity(0.85)
             }
             .frame(maxWidth: .infinity)
         }
-        .buttonStyle(ChunkyButtonStyle(palette: selected ? palette : .gray, cornerRadius: 16, depth: 5))
+        .buttonStyle(ChunkyButtonStyle(palette: selected ? palette : .gray, cornerRadius: 16, depth: 5,
+                                       horizontalPadding: 6))
         .overlay(RoundedRectangle(cornerRadius: 16)
                     .strokeBorder(selected ? Color.white : Color.clear, lineWidth: 3)
                     .padding(.bottom, 5))
         .overlay(alignment: .topTrailing) {
-            if variant == .ultimate {
+            if variant == .vanish {
                 Text("NEW")
                     .font(gameFont(10, weight: .black))
                     .foregroundColor(.white)
@@ -190,7 +235,8 @@ struct MainMenuView: View {
                     }
                     .frame(maxWidth: .infinity)
                 }
-                .buttonStyle(ChunkyButtonStyle(palette: selected ? item.palette : .gray, cornerRadius: 16, depth: 5))
+                .buttonStyle(ChunkyButtonStyle(palette: selected ? item.palette : .gray, cornerRadius: 16, depth: 5,
+                                               horizontalPadding: 3))
                 .overlay(RoundedRectangle(cornerRadius: 16)
                             .strokeBorder(selected ? Color.white : Color.clear, lineWidth: 3)
                             .padding(.bottom, 5))
@@ -266,7 +312,7 @@ struct MainMenuView: View {
             }
             .frame(maxWidth: .infinity)
         }
-        .buttonStyle(ChunkyButtonStyle(palette: palette, cornerRadius: 16, depth: 5))
+        .buttonStyle(ChunkyButtonStyle(palette: palette, cornerRadius: 16, depth: 5, horizontalPadding: 4))
         .overlay(alignment: .topTrailing) {
             if badge {
                 Circle()
@@ -309,20 +355,22 @@ struct MainMenuView: View {
                     }
                     .buttonStyle(ChunkyButtonStyle(palette: .green, cornerRadius: 22, depth: 8))
                     
-                    Button {
-                        ads.showRewarded(adsRemoved: progress.adsRemoved) { earned in
-                            progress.claimDaily(multiplier: earned ? ads.rewardMultiplier : 1)
-                            Haptics.success()
-                            closeDaily()
+                    if ads.canOfferRewarded(adsRemoved: progress.adsRemoved) {
+                        Button {
+                            ads.showRewarded(adsRemoved: progress.adsRemoved, placement: "daily_reward") { earned in
+                                progress.claimDaily(multiplier: earned ? ads.lastRewardMultiplier : 1)
+                                Haptics.success()
+                                closeDaily()
+                            }
+                        } label: {
+                            HStack {
+                                Image(systemName: "play.rectangle.fill")
+                                Text("\(progress.adsRemoved ? "" : "WATCH AD · ")CLAIM \(ads.rewardLabel(adsRemoved: progress.adsRemoved))")
+                            }
+                            .frame(maxWidth: .infinity)
                         }
-                    } label: {
-                        HStack {
-                            Image(systemName: "play.rectangle.fill")
-                            Text("CLAIM ×\(ads.rewardMultiplier)")
-                        }
-                        .frame(maxWidth: .infinity)
+                        .buttonStyle(ChunkyButtonStyle(palette: .orange, cornerRadius: 18))
                     }
-                    .buttonStyle(ChunkyButtonStyle(palette: .orange, cornerRadius: 18))
                 } else {
                     Text("Come back tomorrow for more!")
                         .font(gameFont(16))
@@ -347,7 +395,7 @@ struct MainMenuView: View {
     private func dayTile(day: Int, todayIndex: Int) -> some View {
         let claimedAlready = progress.canClaimDaily ? day < todayIndex : day <= todayIndex
         let isToday = progress.canClaimDaily && day == todayIndex
-        let amount = 25 + 15 * day
+        let amount = Economy.dailyReward(streak: day)
         
         return VStack(spacing: 4) {
             Text("DAY \(day + 1)").font(gameFont(11)).foregroundColor(.white.opacity(0.9))

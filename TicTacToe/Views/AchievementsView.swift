@@ -12,6 +12,7 @@ struct AchievementsView: View {
     var body: some View {
         ZStack {
             AnimatedBackdrop()
+                .onAppear { AppAnalytics.shared.screen("progress") }
             
             VStack(spacing: 0) {
                 HStack {
@@ -32,6 +33,8 @@ struct AchievementsView: View {
                             statTile("BEST STREAK", progress.data.bestWinStreak, "flame.fill")
                         }
                         
+                        backupCard
+                        
                         RibbonTitle(text: "ACHIEVEMENTS")
                         
                         ForEach(Achievement.allCases) { achievement in
@@ -43,6 +46,31 @@ struct AchievementsView: View {
                 }
             }
         }
+    }
+    
+    /// Tells players whether their progress and coins are being backed up, so they know what happens if they delete the app
+    private var backupCard: some View {
+        let backedUp = CloudSave.isAvailable
+        return HStack(spacing: 12) {
+            Image(systemName: backedUp ? "icloud.fill" : "icloud.slash.fill")
+                .font(.system(size: 24, weight: .bold))
+                .foregroundColor(backedUp ? ButtonPalette.green.top : ButtonPalette.orange.top)
+                .frame(width: 36)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(backedUp ? "PROGRESS BACKED UP" : "NOT BACKED UP")
+                    .font(gameFont(14, weight: .black))
+                    .foregroundColor(.white)
+                Text(backedUp
+                     ? "Your coins and unlocks come back if you reinstall or switch phones."
+                     : "Sign in to iCloud in Settings, or your coins and unlocks are lost if you delete the app.")
+                    .font(gameFont(12, weight: .semibold))
+                    .foregroundColor(.white.opacity(0.75))
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(12)
+        .gamePanel(cornerRadius: 20)
     }
     
     private func statTile(_ title: String, _ value: Int, _ icon: String) -> some View {
