@@ -111,6 +111,8 @@ struct ChunkyButtonStyle: ButtonStyle {
     var palette: ButtonPalette = .green
     var cornerRadius: CGFloat = 18
     var depth: CGFloat = 6
+    /// Small buttons with long labels (like the mode chips) need less side padding
+    var horizontalPadding: CGFloat = 18
     @Environment(\.isEnabled) private var isEnabled
     
     func makeBody(configuration: Configuration) -> some View {
@@ -122,7 +124,7 @@ struct ChunkyButtonStyle: ButtonStyle {
             .foregroundColor(.white)
             .outlined(Color.black.opacity(0.35), width: 1.5)
             .padding(.vertical, 12)
-            .padding(.horizontal, 18)
+            .padding(.horizontal, horizontalPadding)
             .background(
                 RoundedRectangle(cornerRadius: cornerRadius)
                     .fill(LinearGradient(colors: [colors.top, colors.bottom], startPoint: .top, endPoint: .bottom))
@@ -229,6 +231,7 @@ struct LevelBadge: View {
 
 struct RibbonTitle: View {
     let text: String
+    var palette: ButtonPalette = .purple
     
     var body: some View {
         Text(text)
@@ -239,7 +242,7 @@ struct RibbonTitle: View {
             .padding(.vertical, 6)
             .background(
                 Capsule()
-                    .fill(LinearGradient(colors: [ButtonPalette.purple.top, ButtonPalette.purple.bottom],
+                    .fill(LinearGradient(colors: [palette.top, palette.bottom],
                                          startPoint: .top, endPoint: .bottom))
                     .overlay(Capsule().strokeBorder(Color.white.opacity(0.4), lineWidth: 2))
                     .shadow(color: Color.black.opacity(0.3), radius: 0, x: 0, y: 4)

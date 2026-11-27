@@ -76,6 +76,19 @@ struct LeaderboardView: View {
             Text(entry.name.uppercased())
                 .font(gameFont(17, weight: .black))
                 .foregroundColor(.white)
+            
+            if entry.isPlayer, let title = progress.title {
+                HStack(spacing: 3) {
+                    Image(systemName: title.icon)
+                    Text(title.name.uppercased())
+                }
+                .font(gameFont(9, weight: .black))
+                .foregroundColor(GamePalette.goldEdge)
+                .padding(.horizontal, 6)
+                .padding(.vertical, 2)
+                .background(Capsule().fill(GamePalette.gold))
+                .lineLimit(1)
+            }
                         
             Spacer()
             
@@ -108,15 +121,15 @@ struct LeaderboardView: View {
                 Label("2× POINTS ON YOUR NEXT WIN", systemImage: "bolt.fill")
                     .font(gameFont(14))
                     .foregroundColor(GamePalette.gold)
-            } else {
+            } else if ads.canOfferRewarded(adsRemoved: progress.adsRemoved) {
                 Button {
-                    ads.showRewarded(adsRemoved: progress.adsRemoved) { earned in
+                    ads.showRewarded(adsRemoved: progress.adsRemoved, placement: "points_boost") { earned in
                         if earned { progress.armPointsBoost() }
                     }
                 } label: {
                     HStack {
                         Image(systemName: "play.rectangle.fill")
-                        Text("2× POINTS NEXT WIN")
+                        Text("\(progress.adsRemoved ? "" : "WATCH AD · ")2× POINTS NEXT WIN")
                     }
                     .frame(maxWidth: .infinity)
                 }

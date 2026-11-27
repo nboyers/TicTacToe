@@ -1,0 +1,93 @@
+{
+  "identifier" : "A1B2C3D4",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+    {
+      "displayPrice" : "2.99",
+      "familyShareable" : false,
+      "internalID" : "6740000001",
+      "localizations" : [
+        {
+          "description" : "No ads between games. Top rewards, no ad to watch.",
+          "displayName" : "Remove Ads",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "frent.nobos.TicTacToe.removeads",
+      "referenceName" : "Remove Ads",
+      "type" : "NonConsumable"
+    },
+    {
+      "displayPrice" : "0.99",
+      "familyShareable" : false,
+      "internalID" : "6740000002",
+      "localizations" : [
+        {
+          "description" : "500 coins for boosts, hints, skins and themes.",
+          "displayName" : "500 Coins",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "frent.nobos.TicTacToe.coins500",
+      "referenceName" : "500 Coins",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "2.99",
+      "familyShareable" : false,
+      "internalID" : "6740000003",
+      "localizations" : [
+        {
+          "description" : "1500 coins for boosts, hints, skins and themes. Best value!",
+          "displayName" : "1500 Coins",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "frent.nobos.TicTacToe.coins1500",
+      "referenceName" : "1500 Coins",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "7.99",
+      "familyShareable" : false,
+      "internalID" : "6740000004",
+      "localizations" : [
+        {
+          "description" : "5,000 coins. Better value.",
+          "displayName" : "5,000 Coins",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "frent.nobos.TicTacToe.coins5000",
+      "referenceName" : "5000 Coins",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "19.99",
+      "familyShareable" : false,
+      "internalID" : "6740000005",
+      "localizations" : [
+        {
+          "description" : "15,000 coins. Best value.",
+          "displayName" : "15,000 Coins",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "frent.nobos.TicTacToe.coins15000",
+      "referenceName" : "15000 Coins",
+      "type" : "Consumable"
+    }
+  ],
+  "settings" : {
+
+  },
+  "subscriptionGroups" : [
+
+  ],
+  "version" : {
+    "major" : 3,
+    "minor" : 0
+  }
+}

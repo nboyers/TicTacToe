@@ -70,10 +70,10 @@ enum Achievement: String, CaseIterable, Identifiable, Codable {
     
     var rewardCoins: Int {
         switch self {
-        case .firstWin, .winStreak3, .dailyStreak3: return 25
-        case .tenWins, .played50, .winStreak5, .dailyStreak7: return 50
-        case .ultimateWin: return 75
-        case .tamedImpossible, .ultimateWins5: return 100
+        case .firstWin, .winStreak3, .dailyStreak3: return 15
+        case .tenWins, .played50, .winStreak5, .dailyStreak7: return 25
+        case .ultimateWin: return 40
+        case .tamedImpossible, .ultimateWins5: return 50
         }
     }
     

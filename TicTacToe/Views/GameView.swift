@@ -16,14 +16,17 @@ struct GameView: View {
     
     @State private var reward: RoundReward?
     @State private var rewardDoubled = false
+    @State private var rewardMultiplierUsed = 2
     @State private var showResult = false
     @State private var pendingPerk: Perk?
     @State private var showShop = false
-    @State private var showRules = false
-    @AppStorage("seenUltimateRules") private var seenRules = false
+    @State private var roundStart = Date()
+    @State private var showTutorial = false
+    @AppStorage("seenUltimateRules") private var seenUltimateTutorial = false
+    @AppStorage("seenVanishRules") private var seenVanishTutorial = false
     
-    private let hintCost = 15
-    private let undoCost = 10
+    private let hintCost = Economy.hintCost
+    private let undoCost = Economy.undoCost
     private let column: [GridItem] = Array(repeating: GridItem(.flexible(), spacing: 10), count: 3)
     
     enum Perk: Identifiable {
@@ -56,6 +59,10 @@ struct GameView: View {
                 let lost = viewModel.ultimateBoard.boardsWon(by: .O)
                 return lost <= 1 ? 3 : (lost <= 3 ? 2 : 1)
             }
+            if viewModel.variant == .vanish { // fewer moves to win = more stars
+                let moves = viewModel.humanMoves
+                return moves <= 4 ? 3 : (moves <= 6 ? 2 : 1)
+            }
             let moves = viewModel.gameBoard.position.filter { $0 == .X }.count
             return moves <= 3 ? 3 : (moves == 4 ? 2 : 1)
         }
@@ -76,8 +83,6 @@ struct GameView: View {
             .padding(.horizontal)
             .padding(.top, 8)
             
-            if showRules { rulesOverlay }
-            
             if showResult, viewModel.outcome != nil {
                 resultOverlay
                     .transition(.opacity.combined(with: .scale(scale: 0.85)))
@@ -86,19 +91,31 @@ struct GameView: View {
         }
         .toolbar(.hidden, for: .navigationBar)
         .onAppear {
-            if isUltimate && !seenRules {
-                seenRules = true
-                showRules = true
+            AppAnalytics.shared.screen("game")
+            startRound()
+            // Teach each new variant the first time it is played
+            switch viewModel.variant {
+            case .ultimate where !seenUltimateTutorial:
+                seenUltimateTutorial = true
+                showTutorial = true
+            case .vanish where !seenVanishTutorial:
+                seenVanishTutorial = true
+                showTutorial = true
+            default:
+                break
             }
         }
+        .fullScreenCover(isPresented: $showTutorial) { TutorialView(variant: viewModel.variant) }
         .onChange(of: viewModel.outcome) { _, outcome in
             if let outcome { finish(with: outcome) }
         }
         .confirmationDialog("Need a boost?", isPresented: Binding(get: { pendingPerk != nil },
                                                                   set: { if !$0 { pendingPerk = nil } }),
                             titleVisibility: .visible) {
-            Button("Watch a short ad") {
-                if let perk = pendingPerk { watchAd(for: perk) }
+            if ads.canOfferRewarded(adsRemoved: progress.adsRemoved) {
+                Button(pendingPerk == .undo ? "Watch an ad for a free Undo" : "Watch an ad for a free Hint") {
+                    if let perk = pendingPerk { watchAd(for: perk) }
+                }
             }
             Button("Get coins") { showShop = true }
             Button("Cancel", role: .cancel) {}
@@ -122,8 +139,8 @@ struct GameView: View {
                     .font(gameFont(22, weight: .black))
                     .foregroundColor(.white)
                     .outlined(GamePalette.ink, width: 2)
-                if isUltimate {
-                    Text("ULTIMATE")
+                if viewModel.variant != .classic {
+                    Text(viewModel.variant.name.uppercased())
                         .font(gameFont(12, weight: .black))
                         .foregroundColor(GamePalette.gold)
                         .outlined(GamePalette.goldEdge, width: 1)
@@ -131,8 +148,8 @@ struct GameView: View {
             }
             Spacer()
             
-            if isUltimate {
-                Button { withAnimation { showRules = true } } label: {
+            if viewModel.variant != .classic {
+                Button { showTutorial = true } label: {
                     Image(systemName: "questionmark").font(.system(size: 18, weight: .black))
                 }
                 .buttonStyle(ChunkyButtonStyle(palette: .purple, cornerRadius: 14, depth: 4))
@@ -222,53 +239,8 @@ struct GameView: View {
             .animation(.spring(response: 0.3, dampingFraction: 0.6), value: viewModel.ultimateBoard)
     }
     
-    private var rulesOverlay: some View {
-        ZStack {
-            Color.black.opacity(0.65).ignoresSafeArea()
-                .onTapGesture { withAnimation { showRules = false } }
-            
-            VStack(spacing: 14) {
-                Text("ULTIMATE RULES")
-                    .font(gameFont(28, weight: .black))
-                    .foregroundColor(GamePalette.gold)
-                    .outlined(GamePalette.goldEdge, width: 2)
-                
-                VStack(alignment: .leading, spacing: 10) {
-                    ruleRow("1", "Every big square holds its own mini tic-tac-toe board.")
-                    ruleRow("2", "Where you play inside a mini-board decides which mini-board your opponent must play in next.")
-                    ruleRow("3", "Win a mini-board to claim that big square.")
-                    ruleRow("4", "Claim three big squares in a row to win the game.")
-                    ruleRow("5", "Sent to a board that is already decided? Play anywhere open.")
-                }
-                
-                Button { withAnimation { showRules = false } } label: {
-                    Text("GOT IT").font(gameFont(24, weight: .black)).frame(maxWidth: .infinity)
-                }
-                .buttonStyle(ChunkyButtonStyle(palette: .green, cornerRadius: 22, depth: 8))
-            }
-            .padding(20)
-            .gamePanel(cornerRadius: 28)
-            .padding(.horizontal, 24)
-        }
-        .transition(.opacity)
-    }
-    
-    private func ruleRow(_ number: String, _ text: String) -> some View {
-        HStack(alignment: .top, spacing: 10) {
-            Text(number)
-                .font(gameFont(16, weight: .black))
-                .foregroundColor(.white)
-                .frame(width: 28, height: 28)
-                .background(Circle().fill(ButtonPalette.purple.bottom))
-            Text(text)
-                .font(gameFont(15, weight: .semibold))
-                .foregroundColor(.white)
-                .fixedSize(horizontal: false, vertical: true)
-        }
-    }
-    
     private var classicPanel: some View {
-        let winningLine = viewModel.gameBoard.winningLine ?? []
+        let winningLine = viewModel.winningLine
         return LazyVGrid(columns: column, spacing: 10) {
             ForEach(0..<9, id: \.self) { i in
                 tile(i, winning: winningLine.contains(i))
@@ -276,12 +248,12 @@ struct GameView: View {
         }
         .padding(14)
         .gamePanel(cornerRadius: 28)
-        .animation(.spring(response: 0.35, dampingFraction: 0.55), value: viewModel.gameBoard.position)
+        .animation(.spring(response: 0.35, dampingFraction: 0.55), value: viewModel.displayedPosition)
         .disabled(viewModel.isDisabled)
     }
     
     private func tile(_ i: Int, winning: Bool) -> some View {
-        let piece = viewModel.gameBoard.position[i]
+        let piece = viewModel.piece(at: i)
         let radius: CGFloat = 16
         let top = winning ? Color(red: 1.0, green: 0.95, blue: 0.5) : theme.tileTop
         let bottom = winning ? GamePalette.goldDeep : theme.tileBottom
@@ -295,6 +267,18 @@ struct GameView: View {
                 RoundedRectangle(cornerRadius: radius)
                     .strokeBorder(GamePalette.gold, lineWidth: 5)
                     .pulsing(1.05)
+            }
+            
+            if viewModel.fadingSquares.contains(i) {
+                // Vanish mode: this mark disappears the next time its owner moves
+                RoundedRectangle(cornerRadius: radius)
+                    .strokeBorder(Color.black.opacity(0.4), style: StrokeStyle(lineWidth: 3, dash: [7, 7]))
+                    .pulsing(1.03)
+                Image(systemName: "hourglass")
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundColor(Color.black.opacity(0.55))
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+                    .padding(8)
             }
             
             if let glyph = progress.skin.glyph(for: piece) {
@@ -325,7 +309,7 @@ struct GameView: View {
         .scaleEffect(winning ? 1.06 : 1)
         .animation(.spring(response: 0.35, dampingFraction: 0.5), value: winning)
         .contentShape(Rectangle())
-        .onTapGesture { viewModel.play(i) }
+        .onTapGesture { viewModel.tap(i) }
         .accessibilityLabel(piece == .E ? "Empty square \(i + 1)" : "\(piece == .X ? "X" : "O") in square \(i + 1)")
     }
     
@@ -422,7 +406,7 @@ struct GameView: View {
     }
     
     private func rewardPanel(_ reward: RoundReward) -> some View {
-        let coins = rewardDoubled ? reward.coins * ads.rewardMultiplier : reward.coins
+        let coins = rewardDoubled ? reward.coins * rewardMultiplierUsed : reward.coins
         return VStack(spacing: 10) {
             HStack(spacing: 24) {
                 HStack(spacing: 6) {
@@ -481,18 +465,20 @@ struct GameView: View {
     
     private var resultButtons: some View {
         VStack(spacing: 12) {
-            if let reward, reward.coins > 0, !rewardDoubled {
+            if let reward, reward.coins > 0, !rewardDoubled, ads.canOfferRewarded(adsRemoved: progress.adsRemoved) {
                 Button {
-                    ads.showRewarded(adsRemoved: progress.adsRemoved) { earned in
+                    ads.showRewarded(adsRemoved: progress.adsRemoved, placement: "double_coins") { earned in
                         if earned {
-                            progress.add(coins: reward.coins * (ads.rewardMultiplier - 1)) // base was already paid
+                            rewardMultiplierUsed = ads.lastRewardMultiplier // set by what the ad paid
+                            progress.add(coins: reward.coins * (rewardMultiplierUsed - 1)) // base was already paid
                             rewardDoubled = true
                         }
                     }
                 } label: {
                     HStack {
                         Image(systemName: "play.rectangle.fill")
-                        Text("COLLECT ×\(ads.rewardMultiplier)")
+                        // AdMob policy: state the action and the reward before the ad
+                        Text("\(progress.adsRemoved ? "" : "WATCH AD · ")\(ads.rewardLabel(adsRemoved: progress.adsRemoved)) COINS")
                     }
                     .frame(maxWidth: .infinity)
                 }
@@ -526,6 +512,18 @@ struct GameView: View {
         rewardDoubled = false
         ads.registerFinishedGame()
         
+        AppAnalytics.shared.log(AnalyticsEvent.gameEnd, [
+            "variant": viewModel.variant.name.lowercased(),
+            "mode": viewModel.mode.analyticsName,
+            "result": result == .win ? "win" : (result == .loss ? "loss" : "draw"),
+            "moves": viewModel.humanMoves,
+            "duration_s": Int(Date().timeIntervalSince(roundStart)),
+            "stars": stars,
+            "coins_earned": reward?.coins ?? 0,
+            "points": reward?.points ?? 0,
+            "games_played": progress.gamesPlayed
+        ])
+        
         if result == .loss { Haptics.failure() } else { Haptics.success() }
         
         // Let the player see the winning line before the overlay appears
@@ -539,21 +537,39 @@ struct GameView: View {
             withAnimation { showResult = false }
             reward = nil
             viewModel.resetGame()
+            startRound()
         }
+    }
+    
+    private func startRound() {
+        roundStart = Date()
+        AppAnalytics.shared.log(AnalyticsEvent.gameStart, [
+            "variant": viewModel.variant.name.lowercased(),
+            "mode": viewModel.mode.analyticsName,
+            "games_played": progress.gamesPlayed
+        ])
     }
     
     private func use(_ perk: Perk) {
         let cost = perk == .hint ? hintCost : undoCost
+        let kind = perk == .hint ? "hint" : "undo"
         if progress.spend(cost) {
+            AppAnalytics.shared.log(AnalyticsEvent.helperUsed, ["kind": kind, "method": "coins", "cost": cost])
             perform(perk)
         } else {
+            // Moment of intent without the coins: the key signal for pricing and for coin pack offers
+            AppAnalytics.shared.log(AnalyticsEvent.lowCoinsPrompt, ["kind": kind, "coins": progress.coins, "cost": cost])
             pendingPerk = perk
         }
     }
     
     private func watchAd(for perk: Perk) {
-        ads.showRewarded(adsRemoved: progress.adsRemoved) { earned in
-            if earned { perform(perk) }
+        let kind = perk == .hint ? "hint" : "undo"
+        ads.showRewarded(adsRemoved: progress.adsRemoved, placement: "perk_\(kind)") { earned in
+            if earned {
+                AppAnalytics.shared.log(AnalyticsEvent.helperUsed, ["kind": kind, "method": "ad"])
+                perform(perk)
+            }
         }
     }
     

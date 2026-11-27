@@ -18,6 +18,7 @@ struct TicTacToeApp: App {
         let progress = ProgressStore()
         _progress = StateObject(wrappedValue: progress)
         _store = StateObject(wrappedValue: StoreManager(progress: progress))
+        AppAnalytics.shared.start()
     }
     
     var body: some Scene {
@@ -26,6 +27,7 @@ struct TicTacToeApp: App {
                 .environmentObject(progress)
                 .environmentObject(store)
                 .environmentObject(ads)
+                .task { await ads.start() } // consent, tracking prompt, then the ad SDK
         }
     }
 }

@@ -21,8 +21,13 @@ struct RoundReward {
     var ranksGained: Int = 0
 }
 
-struct PlayerData: Codable {
-    var coins = 50 // small welcome balance so the first hint feels free
+struct PlayerData: Codable, Equatable {
+    var coins = Economy.startingCoins // small welcome balance so the first hint feels free
+    // Coins are also tracked as two totals that only ever grow. They let saves from two devices be
+    // merged without losing or duplicating coins (balance = earned - spent). Use credit/debit.
+    var coinsEarned = Economy.startingCoins
+    var coinsSpent = 0
+    var modified = Date.distantPast // when progress last changed; the newer save wins where a merge can't combine
     var xp = 0
     var wins = 0
     var losses = 0
@@ -35,10 +40,15 @@ struct PlayerData: Codable {
     var weeklyPoints = 0
     var weekStart: Date?
     var pointsBoostArmed = false // opt-in: the next win earns double leaderboard points
+    var adCoinsClaimed = 0 // "free coins" ads watched on adCoinsDay
+    var adCoinsDay: Date?
     var streakShields = 0
     var magnetGames = 0 // games left with +50% coins
     var ownedSkins: Set<PieceSkin> = [.classic]
     var selectedSkin: PieceSkin = .classic
+    var ownedTitles: Set<PlayerTitle> = []
+    var selectedTitle: PlayerTitle?
+    var vaultSpent = 0 // lifetime coins spent on Vault items; drives the Collector Rank
     var lastDailyClaim: Date?
     var adsRemoved = false
     var achievements: Set<Achievement> = []
@@ -52,6 +62,9 @@ struct PlayerData: Codable {
         case impossibleDraws, ultimateWins, weeklyPoints, weekStart, pointsBoostArmed
         case lastDailyClaim, adsRemoved, achievements, ownedThemes, selectedTheme
         case streakShields, magnetGames, ownedSkins, selectedSkin
+        case adCoinsClaimed, adCoinsDay
+        case ownedTitles, selectedTitle, vaultSpent
+        case coinsEarned, coinsSpent, modified
     }
     
     // Tolerates saves from older versions that don't have newer fields yet
@@ -59,6 +72,9 @@ struct PlayerData: Codable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let defaults = PlayerData()
         coins = try container.decodeIfPresent(Int.self, forKey: .coins) ?? defaults.coins
+        coinsEarned = try container.decodeIfPresent(Int.self, forKey: .coinsEarned) ?? coins // older saves: the balance counts as earned
+        coinsSpent = try container.decodeIfPresent(Int.self, forKey: .coinsSpent) ?? 0
+        modified = try container.decodeIfPresent(Date.self, forKey: .modified) ?? .distantPast
         xp = try container.decodeIfPresent(Int.self, forKey: .xp) ?? defaults.xp
         wins = try container.decodeIfPresent(Int.self, forKey: .wins) ?? defaults.wins
         losses = try container.decodeIfPresent(Int.self, forKey: .losses) ?? defaults.losses
@@ -71,6 +87,11 @@ struct PlayerData: Codable {
         weeklyPoints = try container.decodeIfPresent(Int.self, forKey: .weeklyPoints) ?? defaults.weeklyPoints
         weekStart = try container.decodeIfPresent(Date.self, forKey: .weekStart)
         pointsBoostArmed = try container.decodeIfPresent(Bool.self, forKey: .pointsBoostArmed) ?? defaults.pointsBoostArmed
+        ownedTitles = try container.decodeIfPresent(Set<PlayerTitle>.self, forKey: .ownedTitles) ?? defaults.ownedTitles
+        selectedTitle = try container.decodeIfPresent(PlayerTitle.self, forKey: .selectedTitle)
+        vaultSpent = try container.decodeIfPresent(Int.self, forKey: .vaultSpent) ?? defaults.vaultSpent
+        adCoinsClaimed = try container.decodeIfPresent(Int.self, forKey: .adCoinsClaimed) ?? defaults.adCoinsClaimed
+        adCoinsDay = try container.decodeIfPresent(Date.self, forKey: .adCoinsDay)
         streakShields = try container.decodeIfPresent(Int.self, forKey: .streakShields) ?? defaults.streakShields
         magnetGames = try container.decodeIfPresent(Int.self, forKey: .magnetGames) ?? defaults.magnetGames
         ownedSkins = try container.decodeIfPresent(Set<PieceSkin>.self, forKey: .ownedSkins) ?? defaults.ownedSkins
@@ -81,6 +102,16 @@ struct PlayerData: Codable {
         ownedThemes = try container.decodeIfPresent(Set<BoardTheme>.self, forKey: .ownedThemes) ?? defaults.ownedThemes
         selectedTheme = try container.decodeIfPresent(BoardTheme.self, forKey: .selectedTheme) ?? defaults.selectedTheme
     }
+    
+    mutating func credit(_ amount: Int) {
+        coins += amount
+        coinsEarned += amount
+    }
+    
+    mutating func debit(_ amount: Int) {
+        coins -= amount
+        coinsSpent += amount
+    }
 }
 
 @MainActor
@@ -89,22 +120,67 @@ final class ProgressStore: ObservableObject {
     private static let storageKey = "playerData.v1"
     
     @Published private(set) var data: PlayerData {
-        didSet { save() }
+        didSet {
+            // Every real change stamps the save so merges know which is newer. A merge from iCloud
+            // doesn't: stamping it would make the other device think it changed and merge it back, forever.
+            if !isApplyingMerge { data.modified = Date() }
+            save()
+        }
     }
     
+    private var isApplyingMerge = false
+    private var cloudObserver: Task<Void, Never>?
+    
     init() {
+        let local: PlayerData
         if let saved = UserDefaults.standard.data(forKey: Self.storageKey),
            let decoded = try? JSONDecoder().decode(PlayerData.self, from: saved) {
-            data = decoded
+            local = decoded
         } else {
-            data = PlayerData()
+            local = PlayerData()
         }
+        
+        // Pick up progress backed up in iCloud: this is what restores a reinstalled or new device
+        CloudSave.refresh()
+        if let cloud = CloudSave.load() {
+            data = local.merged(with: cloud)
+        } else {
+            data = local
+        }
+        save()
+        
+        // iCloud delivers changes made on another device (or a late first sync after reinstalling)
+        cloudObserver = Task { [weak self] in
+            for await _ in NotificationCenter.default.notifications(named: NSUbiquitousKeyValueStore.didChangeExternallyNotification) {
+                self?.mergeFromCloud()
+            }
+        }
+    }
+    
+    deinit {
+        cloudObserver?.cancel()
+    }
+    
+    private func mergeFromCloud() {
+        guard let cloud = CloudSave.load() else { return }
+        let merged = data.merged(with: cloud)
+        
+        // Only apply it if the progress itself differs, not just the timestamp
+        var comparable = merged
+        comparable.modified = data.modified
+        guard comparable != data else { return }
+        
+        AppAnalytics.shared.log("cloud_restore", ["coins": merged.coins])
+        isApplyingMerge = true
+        data = merged
+        isApplyingMerge = false
     }
     
     private func save() {
         if let encoded = try? JSONEncoder().encode(data) {
             UserDefaults.standard.set(encoded, forKey: Self.storageKey)
         }
+        CloudSave.save(data)
     }
     
     // MARK: Derived values
@@ -174,7 +250,7 @@ final class ProgressStore: ObservableObject {
     }
     
     var nextDailyReward: Int {
-        25 + 15 * min(activeDailyStreak, 6) // grows every consecutive day, caps on day 7
+        Economy.dailyReward(streak: activeDailyStreak)
     }
     
     @discardableResult
@@ -185,7 +261,9 @@ final class ProgressStore: ObservableObject {
         if daysSinceLastClaim == 2 && data.streakShields > 0 { data.streakShields -= 1 } // shield used
         data.loginStreak = streak + 1
         data.lastDailyClaim = Date()
-        data.coins += reward
+        data.credit(reward)
+        AppAnalytics.shared.log(AnalyticsEvent.dailyClaim,
+                                ["streak": data.loginStreak, "coins": reward, "multiplier": multiplier])
         _ = unlockAchievements() // streak achievements
         return reward
     }
@@ -203,28 +281,28 @@ final class ProgressStore: ObservableObject {
             data.wins += 1
             data.winStreak += 1
             data.bestWinStreak = max(data.bestWinStreak, data.winStreak)
-            coins = 10 + 5 * (difficulty ?? 0) + 3 * min(data.winStreak - 1, 5) // streak bonus
+            coins = Economy.winCoins(difficulty: difficulty ?? 0, streak: data.winStreak)
             xp = 20 + 5 * (difficulty ?? 0)
         case .draw:
             data.draws += 1
             data.winStreak = 0
-            coins = 4
+            coins = Economy.drawCoins
             xp = 10
             if difficulty == 3 { data.impossibleDraws += 1 }
         case .loss:
             data.losses += 1
             data.winStreak = 0
-            coins = 2 // losing still pays a little so it never feels pointless
+            coins = Economy.lossCoins
             xp = 5
         }
         
         if difficulty == nil { // pass-and-play: no stats farming
-            coins = min(coins, 3)
+            coins = min(coins, Economy.passAndPlayCap)
             xp = min(xp, 5)
         }
         
         if ultimate { // much longer games, so they pay double
-            coins *= 2
+            coins *= Economy.ultimateMultiplier
             xp *= 2
             if result == .win { data.ultimateWins += 1 }
         }
@@ -241,9 +319,13 @@ final class ProgressStore: ObservableObject {
         }
         data.weeklyPoints += points
         
-        data.coins += coins
+        data.credit(coins)
         data.xp += xp
         let unlocked = unlockAchievements()
+        if level > levelBefore {
+            AppAnalytics.shared.log(AnalyticsEvent.levelUp, ["level": level, "games_played": gamesPlayed])
+        }
+        AppAnalytics.shared.setUserProperty(String(level), forName: "level")
         return RoundReward(coins: coins, xp: xp, leveledUp: level > levelBefore, newAchievements: unlocked,
                            points: points, ranksGained: max(0, rankBefore - weeklyRank))
     }
@@ -251,21 +333,40 @@ final class ProgressStore: ObservableObject {
     private func unlockAchievements() -> [Achievement] {
         let newlyEarned = Achievement.allCases.filter { !data.achievements.contains($0) && $0.isEarned(by: stats) }
         for achievement in newlyEarned {
+            AppAnalytics.shared.log(AnalyticsEvent.achievementUnlocked, ["id": achievement.rawValue])
             data.achievements.insert(achievement)
-            data.coins += achievement.rewardCoins
+            data.credit(achievement.rewardCoins)
         }
         return newlyEarned
     }
     
+    // MARK: Free coins from ads
+    private var adCoinsClaimedToday: Int {
+        guard let day = data.adCoinsDay, Calendar.current.isDateInToday(day) else { return 0 }
+        return data.adCoinsClaimed
+    }
+    
+    var freeCoinAdsRemaining: Int {
+        max(0, Economy.freeCoinAdsPerDay - adCoinsClaimedToday)
+    }
+    
+    /// Pays out after the player chose to watch a "free coins" ad; capped per day
+    func claimFreeCoins(coins: Int) {
+        guard freeCoinAdsRemaining > 0 else { return }
+        data.adCoinsClaimed = adCoinsClaimedToday + 1
+        data.adCoinsDay = Date()
+        data.credit(coins)
+    }
+    
     // MARK: Currency
     func add(coins: Int) {
-        data.coins += coins
+        data.credit(coins)
     }
     
     /// Returns false (and changes nothing) when the player can't afford it.
     func spend(_ amount: Int) -> Bool {
         guard data.coins >= amount else { return false }
-        data.coins -= amount
+        data.debit(amount)
         return true
     }
     
@@ -280,6 +381,8 @@ final class ProgressStore: ObservableObject {
         guard spend(theme.price) else { return false }
         data.ownedThemes.insert(theme)
         data.selectedTheme = theme
+        if theme.isVault { data.vaultSpent += theme.price }
+        AppAnalytics.shared.log(AnalyticsEvent.cosmeticBought, ["kind": "theme", "id": theme.rawValue, "price": theme.price])
         return true
     }
     
@@ -311,6 +414,7 @@ final class ProgressStore: ObservableObject {
         case .pointsBoost: data.pointsBoostArmed = true
         case .streakShield: data.streakShields += 1
         }
+        AppAnalytics.shared.log(AnalyticsEvent.boostBought, ["boost": boost.rawValue, "price": boost.price])
         return true
     }
     
@@ -324,14 +428,50 @@ final class ProgressStore: ObservableObject {
             data.selectedSkin = skin
             return true
         }
-        guard spend(skin.price) else { return false }
+        guard skin.isAvailable, spend(skin.price) else { return false } // retired limited items can't be bought
         data.ownedSkins.insert(skin)
         data.selectedSkin = skin
+        if skin.isVault { data.vaultSpent += skin.price }
+        AppAnalytics.shared.log(AnalyticsEvent.cosmeticBought, ["kind": "skin", "id": skin.rawValue, "price": skin.price])
+        return true
+    }
+    
+    // MARK: The Vault
+    var collectorRank: Int { Economy.collectorRank(forSpent: data.vaultSpent) }
+    
+    /// Vault spending still needed for the next Collector Rank
+    var coinsToNextRank: Int { Economy.rankThreshold(collectorRank + 1) - data.vaultSpent }
+    
+    var rankProgress: Double {
+        let low = Economy.rankThreshold(collectorRank)
+        let high = Economy.rankThreshold(collectorRank + 1)
+        return Double(data.vaultSpent - low) / Double(high - low)
+    }
+    
+    var title: PlayerTitle? { data.selectedTitle }
+    
+    /// Earned titles unlock automatically from play; bought ones come from the Vault
+    func ownsTitle(_ title: PlayerTitle) -> Bool {
+        title.isEarned(by: stats) || data.ownedTitles.contains(title)
+    }
+    
+    func equip(_ title: PlayerTitle) {
+        guard ownsTitle(title) else { return }
+        data.selectedTitle = title
+    }
+    
+    func buyTitle(_ title: PlayerTitle) -> Bool {
+        guard let price = title.price, !ownsTitle(title), spend(price) else { return false }
+        data.ownedTitles.insert(title)
+        data.vaultSpent += price
+        data.selectedTitle = title
+        AppAnalytics.shared.log(AnalyticsEvent.cosmeticBought, ["kind": "title", "id": title.rawValue, "price": price])
         return true
     }
     
     // MARK: IAP
     func setAdsRemoved() {
         data.adsRemoved = true
+        AppAnalytics.shared.setUserProperty("true", forName: "ads_removed")
     }
 }
