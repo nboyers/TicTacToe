@@ -19,6 +19,7 @@ struct TicTacToeApp: App {
         _progress = StateObject(wrappedValue: progress)
         _store = StateObject(wrappedValue: StoreManager(progress: progress))
         AppAnalytics.shared.start()
+        DiagnosticsCollector.shared.start() // Apple's crash and performance reports
     }
     
     var body: some Scene {

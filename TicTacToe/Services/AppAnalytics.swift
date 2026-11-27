@@ -54,6 +54,9 @@ enum AnalyticsEvent {
     static let purchaseCancelled = "purchase_cancelled"
     static let purchaseFailed = "purchase_failed"
     static let restorePurchases = "restore_purchases"
+    
+    // App health
+    static let diagnosticsReceived = "diagnostics_received"
 }
 
 protocol AnalyticsBackend: AnyObject {
